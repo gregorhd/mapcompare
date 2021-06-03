@@ -348,3 +348,14 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# QGIS files
+*.qgz
+*.bak
+*.bak~
+
+
+# Other directories
+01_data/
+02_outputs/
+misc/

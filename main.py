@@ -1,13 +1,18 @@
+# %%
 import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
+import contextily as ctx
 from sqlalchemy import create_engine
 import time
 import functools
-import demload
-from datetime import datetime
 from misc.pw import password
+
+# Add if saving figure: from datetime import datetime
+# Add if using cartopy for plotting: from cartopy.feature import ShapelyFeature
+# Add if using DEMs as basemap: import demload
 
 def timer(func):
     """Print runtime of decorated function courtesy of RealPython's Primer on Python Decorators: https://realpython.com/primer-on-python-decorators/"""
@@ -21,11 +26,9 @@ def timer(func):
         return value
     return wrapper_timer
 
-# Connection with SQLAlchemy
-
 @timer
 def alchemyConnect(db_name, password):
-    """
+    """Return GeoDataFrames from PostGIS database.
     """
 
     db_connection_url = "postgresql://postgres:" + password + "@localhost:5432/" + db_name
@@ -33,22 +36,18 @@ def alchemyConnect(db_name, password):
     con = create_engine(db_connection_url)
 
     # Find buildings within 500 meters of rivers
-    # 96msec on msc_test, 5.6sec on msc
-    # 101,697 rows
-    sql1 = "WITH buffer as (SELECT ST_Union(ST_Buffer(f.wkb_geometry, 300)) as geom FROM public.ax_fliessgewaesser as f) SELECT g.gebaeudefunktion, g.wkb_geometry as geom FROM public.ax_gebaeude as g JOIN buffer ON ST_Within(g.wkb_geometry, buffer.geom) OR ST_Intersects(g.wkb_geometry, buffer.geom);"
+    # FYI: 500m buffer:  101,697 rows, 5.6sec, 300m buffer: 65,870 rows, 8.9 secs
+    sql1 = "WITH buffer as (SELECT ST_Union(ST_Buffer(f.wkb_geometry, 500)) as geom FROM public.ax_fliessgewaesser as f) SELECT g.gebaeudefunktion, g.wkb_geometry as geom FROM public.ax_gebaeude as g JOIN buffer ON ST_Within(g.wkb_geometry, buffer.geom) OR ST_Intersects(g.wkb_geometry, buffer.geom);"
 
     buildings_in = gpd.GeoDataFrame.from_postgis(sql1, con, crs='epsg:25833')
 
-    # Find all other buildings - is there a more efficient way?
-    # 220msec on msc_test, 1min29msc on msc
-    # 41,878 rows
-    sql2 = "WITH buffer as (SELECT ST_Union(ST_Buffer(f.wkb_geometry, 300)) as geom FROM public.ax_fliessgewaesser as f) SELECT g.gebaeudefunktion, g.wkb_geometry as geom FROM public.ax_gebaeude as g JOIN buffer ON ST_Disjoint(buffer.geom, g.wkb_geometry) WHERE g.gml_id NOT IN (WITH buffer as (SELECT ST_Union(ST_Buffer(f.wkb_geometry, 300)) as geom FROM public.ax_fliessgewaesser as f) SELECT g.gml_id FROM public.ax_gebaeude as g JOIN buffer ON ST_Within(g.wkb_geometry, buffer.geom) OR ST_Intersects(g.wkb_geometry, buffer.geom));" 
+    # Find all other buildings
+    # FYI: 500m buffer: 41,878 rows, 1min29secs, 300m buffer: 77,705 rows, 4min29secs
+    sql2 = "WITH buffer as (SELECT ST_Union(ST_Buffer(f.wkb_geometry, 500)) as geom FROM public.ax_fliessgewaesser as f) SELECT g.gebaeudefunktion, g.wkb_geometry as geom FROM public.ax_gebaeude as g JOIN buffer ON ST_Disjoint(buffer.geom, g.wkb_geometry) WHERE g.gml_id NOT IN (WITH buffer as (SELECT ST_Union(ST_Buffer(f.wkb_geometry, 500)) as geom FROM public.ax_fliessgewaesser as f) SELECT g.gml_id FROM public.ax_gebaeude as g JOIN buffer ON ST_Within(g.wkb_geometry, buffer.geom) OR ST_Intersects(g.wkb_geometry, buffer.geom));" 
 
     buildings_out = gpd.GeoDataFrame.from_postgis(sql2, con, crs='epsg:25833')
 
     # Query 3: Find all rivers
-    # 70-90msec on msc_test and msc
-    # 1,152 rows
     sql3 = "SELECT wkb_geometry as geom FROM public.ax_fliessgewaesser;"
 
     rivers = gpd.GeoDataFrame.from_postgis(sql3, con, crs='epsg:25833')
@@ -74,34 +73,64 @@ def getBBox(*gdfs):
     
     return carto_extent
 
-if __name__ == "__main__":
-    db_name = 'msc_test'
-    
-    buildings_in, buildings_out, rivers = alchemyConnect(db_name, password) # timeit: 214 ms ± 52.5 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+@timer
+def renderFigure(buildings_in, buildings_out, rivers):
+
+    # Get number of features per GDF, to display in legend
+    buildings_in_no = str(len(buildings_in.index))
+    buildings_out_no = str(len(buildings_out.index))
+    rivers_no = str(len(rivers.index))
 
     crs = ccrs.epsg('25833')
 
-    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(10, 10))
+    carto_extent = getBBox(buildings_in, buildings_out, rivers) # 8 secs
 
-    carto_extent = getBBox(buildings_in, buildings_out, rivers)
+    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
 
     ax.set_extent(carto_extent, crs=crs)
+    ax.set_title("Visualisation Task Demo using GeoPandas/Cartopy and contextily" + "\n", fontsize=20)
+    
+    # Add features to Axes
+    
+    buildings_in.plot(ax=ax, facecolor='red')
+    buildings_out.plot(ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+    rivers.plot(ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
-    csvpath = r'c:\Users\grego\OneDrive\01_GIS\11_MSc\00_Project\01_data\02_DEM\DGM20\dgm25_akt.csv'
+    # Add basemap - IMPORTANT: Add features FIRST, THEN add basemap....
+    ctx.add_basemap(ax, crs=rivers.crs.to_string(), source=ctx.providers.Stamen.TerrainBackground)
 
-    data_dir = '01_data/02_DEM/DGM20/'
+    # OPTIONAL instead of contextily: Add 20m DEMs
+    # csvpath = 'c:\Users\grego\OneDrive\01_GIS\11_MSc\00_Project\01_data\02_DEM\DGM20\dgm25_akt.csv'
+    # data_dir = '01_data/02_DEM/DGM20/'
+    # handles, ax = demload.showDEMs(csvpath, data_dir, carto_extent, ax, crs)
+    
+    # Legend
 
-    handles, ax = demload.showDEMs(csvpath, data_dir, carto_extent, ax, crs)
+    buildings_in_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='red')]
+    buildings_out_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='lightgrey', edgecolor='black', linewidth=0.5)]
+    rivers_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='lightblue',edgecolor='blue', linewidth=0.25)]
 
-    ax.add_geometries(buildings_in.geometry, crs=crs, facecolor='red')
+    handles = buildings_in_handle + buildings_out_handle + rivers_handle 
+    labels = ['Buildings within 500m (n=' + buildings_in_no + ')', 'Buildings outside 500m (n=' + buildings_out_no + ')', 'Rivers or streams (n=' + rivers_no + ')']
 
-    ax.add_geometries(buildings_out.geometry, crs=crs, facecolor='white', edgecolor='black', linewidth=0.2)
-
-    ax.add_geometries(rivers.geometry, crs=crs, facecolor='lightblue', edgecolor=None)
-
-    plt.savefig('02_outputs/01_matplotlib/' + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + '.svg', format='svg', orientation='landscape')
-
+    leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 
 
+if __name__ == "__main__":
+    db_name = 'dd' # 'dd' is the complete dataset, 'dd_subset' is the subset for testing
+    
+    buildings_in, buildings_out, rivers = alchemyConnect(db_name, password) # 1min 55 secs
+    
+    renderFigure(buildings_in, buildings_out, rivers) # 49 secs
+
+    # a further 1 min 58 secs to actually display the figure AFTER renderFigure() marked as completed
+
+    # plt.savefig('02_outputs/01_matplotlib/' + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + '.svg', format='svg', orientation='landscape')
 
 
+
+
+
+
+
+# %%
