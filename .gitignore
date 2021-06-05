@@ -354,8 +354,7 @@ MigrationBackup/
 *.bak
 *.bak~
 
-
 # Other directories
 01_data/
 02_outputs/
-misc/
+mapcompare/misc/
