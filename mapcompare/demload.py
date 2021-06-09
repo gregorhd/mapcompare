@@ -1,3 +1,8 @@
+"""Identify which DEM tiles (called 'DGMs' in the German sample dataset) overlap with the study area and return handles to serve as alternative basemap.
+
+1m and 20m DEMs are available though the latter are preferred for performance reasons - therefore no high-level option implemented yet for showDEMs() to more easily choose between the two.
+"""
+
 import os
 import csv
 import itertools

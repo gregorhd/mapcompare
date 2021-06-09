@@ -1,24 +1,27 @@
+"""Plot figure using GeoPandas' GeoDataFrame.plot() interface to matplotlib.
+
+Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
+"""
+
 import os
-import subprocess
+import time
+import functools
+import cProfile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
-import contextily as ctx
-import requests
-import time
-import functools
-import cProfile
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 
-
+# Add if adding contextily basemap: 
+    # import requests
+    # import contextily as ctx
+# Add if adding DEMs as basemap: import demload
 # Add if saving figure: from datetime import datetime
-# Add if using cartopy plotting methods: from cartopy.feature import ShapelyFeature
-# Add if using DEMs as basemap: import demload
 
 def timer(func):
-    """Print runtime of decorated function. Quick option as alternative to cProfile and snakeviz."""
+    """Print runtime of decorated function. Quick option as alternative to cProfile."""
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
         start_time = time.perf_counter()
@@ -29,6 +32,23 @@ def timer(func):
         return value
     return wrapper_timer
 
+def to_cProfile(func):
+    """Create cProfile of wrapped function."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        p = cProfile.Profile()
+        p.enable()
+
+        value = func(*args, **kwargs)
+
+        p.disable()
+        p.dump_stats("mapcompare/profiles/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
+        
+        print(f"\ncProfile created in mapcompare/profiles/ for {func.__name__!r} in module {os.path.basename(__file__)}")
+        return value
+    return wrapper
+
+@to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers):
 
     def getBBox(*gdfs):
@@ -99,27 +119,8 @@ if __name__ == "__main__":
     
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) # 1min 55 secs
     
-    # Record performance profile for renderFigure() and export results to .prof file
-
-    p = cProfile.Profile()
-
-    p.enable()
-
     renderFigure(buildings_in, buildings_out, rivers)
 
-    p.disable()
-
-    p.dump_stats("mapcompare/profiles/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
-
-    """
-    # Visualise cProfile in browser with snakeviz
-    
-    profilepath = "mapcompare/profiles/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof"
-
-    subprocess.run(["snakeviz", profilepath])    
-    """
-    
-    
     # Save figure
     # plt.savefig('02_outputs/plots/' + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + '.svg', format='svg', orientation='landscape')
 
