@@ -1,4 +1,4 @@
-"""Plot figure using GeoPandas' GeoDataFrame.plot() interface to matplotlib.
+"""Plot figure using cartopy's GeoAxes.add_geometries() interface to matplotlib.
 
 Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
 """
@@ -21,7 +21,7 @@ from mapcompare.misc.pw import password
 # Add if saving figure: from datetime import datetime
 
 def timer(func):
-    """Print runtime of decorated function. Quick option as alternative to cProfile."""
+    """Print runtime of decorated function. Quick option as alternative to cProfile and snakeviz."""
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
         start_time = time.perf_counter()
@@ -31,6 +31,7 @@ def timer(func):
         print(f"\nFinished {func.__name__!r} in {run_time:.4f} secs")
         return value
     return wrapper_timer
+
 
 def to_cProfile(func):
     """Create cProfile of wrapped function."""
@@ -83,11 +84,11 @@ def renderFigure(buildings_in, buildings_out, rivers):
     ax.set_extent(carto_extent, crs=crs)
     ax.set_title("Visualisation Task Demo using GeoPandas/Cartopy and contextily" + "\n", fontsize=20)
     
-    # Add features to Axes
+    # Add features to Axes with cartopy add_geometries()
     
-    buildings_in.plot(ax=ax, facecolor='red')
-    buildings_out.plot(ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
-    rivers.plot(ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
+    ax.add_geometries(buildings_in.geometry, crs, facecolor='red')
+    ax.add_geometries(buildings_out.geometry, crs, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+    ax.add_geometries(rivers.geometry, crs, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
     """
     # Add contextily basemap
@@ -100,7 +101,7 @@ def renderFigure(buildings_in, buildings_out, rivers):
     """
     # OPTIONAL instead of contextily: Add 20m DEMs
     # csvpath = 'c:\Users\grego\OneDrive\01_GIS\11_MSc\00_Project\01_data\02_DEM\DGM20\dgm25_akt.csv'
-    # data_dir = '../01_data/02_DEM/DGM20/'
+    # data_dir = '01_data/02_DEM/DGM20/'
     # handles, ax = demload.showDEMs(csvpath, data_dir, carto_extent, ax, crs)
     
     # Legend
@@ -118,11 +119,11 @@ if __name__ == "__main__":
     db_name = 'dd_subset' # 'dd' is the complete dataset, 'dd_subset' is the subset for testing
     
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) # 1min 55 secs
-    
-    renderFigure(buildings_in, buildings_out, rivers)
 
+    renderFigure(buildings_in, buildings_out, rivers)
+    
     # Save figure
-    # plt.savefig('mapcompare/outputs/non-interactive/geopandas (' + db_name + ').svg', format='svg', orientation='landscape')
+    # plt.savefig('mapcompare/outputs/non-interactive/cartopy (' + db_name + ').svg', format='svg', orientation='landscape')
 
 
 

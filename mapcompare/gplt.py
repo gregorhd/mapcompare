@@ -1,4 +1,4 @@
-"""Plot figure using cartopy's GeoAxes.add_geometries() interface to matplotlib.
+"""Plot figure using GeoPandas' GeoDataFrame.plot() interface to matplotlib.
 
 Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
 """
@@ -10,18 +10,13 @@ import cProfile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from cartopy import crs as ccrs
+import geoplot as gplt
+import geoplot.crs as gcrs
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 
-# Add if adding contextily basemap: 
-    # import requests
-    # import contextily as ctx
-# Add if adding DEMs as basemap: import demload
-# Add if saving figure: from datetime import datetime
-
 def timer(func):
-    """Print runtime of decorated function. Quick option as alternative to cProfile and snakeviz."""
+    """Print runtime of decorated function. Quick option as alternative to cProfile."""
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
         start_time = time.perf_counter()
@@ -31,7 +26,6 @@ def timer(func):
         print(f"\nFinished {func.__name__!r} in {run_time:.4f} secs")
         return value
     return wrapper_timer
-
 
 def to_cProfile(func):
     """Create cProfile of wrapped function."""
@@ -43,16 +37,25 @@ def to_cProfile(func):
         value = func(*args, **kwargs)
 
         p.disable()
-        p.dump_stats("mapcompare/profiles/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
+        p.dump_stats("mapcompare/profiles/non-interactive/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
         
-        print(f"\ncProfile created in mapcompare/profiles/ for {func.__name__!r} in module {os.path.basename(__file__)}")
+        print(f"\ncProfile created in mapcompare/profiles/non-interactive/ for {func.__name__!r} in module {os.path.basename(__file__)}")
         return value
     return wrapper
 
+def toLatLon(*gdfs):
+    """Convert GDFs to geographic coordinates as expected by geoplot
+    """
+    li = []
+    for gdf in gdfs:
+        gdf = gdf.to_crs(epsg=4326)
+        li.append(gdf)
 
-@to_cProfile
+    return li
+
+
 def renderFigure(buildings_in, buildings_out, rivers):
-
+    
     def getBBox(*gdfs):
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
         """
@@ -67,44 +70,22 @@ def renderFigure(buildings_in, buildings_out, rivers):
         ymin = np.min([item[1] for item in list_of_bounds])
         ymax = np.max([item[3] for item in list_of_bounds])
         
-        carto_extent = [xmin, xmax, ymin, ymax]
+        # geoplot order different from cartopy order
+        carto_extent = [xmin, ymin, xmax, ymax]
         
         return carto_extent
-    
-    # Get number of features per GDF, to display in legend
+
+     # Get number of features per GDF, to display in legend
     buildings_in_no = str(len(buildings_in.index))
     buildings_out_no = str(len(buildings_out.index))
     rivers_no = str(len(rivers.index))
 
-    crs = ccrs.epsg('25833')
+    carto_extent = getBBox(buildings_in, buildings_out, rivers)
 
-    carto_extent = getBBox(buildings_in, buildings_out, rivers) # 8 secs
+    ax = gplt.polyplot(buildings_in, extent=carto_extent, projection=gcrs.Mercator(), facecolor='red', figsize=(20, 10))
+    gplt.polyplot(buildings_out, ax=ax, projection=gcrs.Mercator(), facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+    gplt.polyplot(rivers, ax=ax, projection=gcrs.Mercator(), facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
-    fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
-
-    ax.set_extent(carto_extent, crs=crs)
-    ax.set_title("Visualisation Task Demo using GeoPandas/Cartopy and contextily" + "\n", fontsize=20)
-    
-    # Add features to Axes with cartopy add_geometries()
-    
-    ax.add_geometries(buildings_in.geometry, crs=crs, facecolor='red')
-    ax.add_geometries(buildings_out.geometry, crs=crs, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
-    ax.add_geometries(rivers.geometry, crs=crs, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
-
-    """
-    # Add contextily basemap
-    
-    try:
-        ctx.add_basemap(ax, crs=rivers.crs.to_string(), source=ctx.providers.Stamen.TerrainBackground)
-    except requests.HTTPError:
-        print("Contextily: No tiles found. Zoom level likely too high. Setting zoom level to 13.")
-        ctx.add_basemap(ax, zoom=13, crs=rivers.crs.to_string(), source=ctx.providers.Stamen.TerrainBackground)
-    """
-    # OPTIONAL instead of contextily: Add 20m DEMs
-    # csvpath = 'c:\Users\grego\OneDrive\01_GIS\11_MSc\00_Project\01_data\02_DEM\DGM20\dgm25_akt.csv'
-    # data_dir = '01_data/02_DEM/DGM20/'
-    # handles, ax = demload.showDEMs(csvpath, data_dir, carto_extent, ax, crs)
-    
     # Legend
 
     buildings_in_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='red')]
@@ -117,14 +98,13 @@ def renderFigure(buildings_in, buildings_out, rivers):
     leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 
 if __name__ == "__main__":
+
     db_name = 'dd_subset' # 'dd' is the complete dataset, 'dd_subset' is the subset for testing
     
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) # 1min 55 secs
 
-    renderFigure(buildings_in, buildings_out, rivers)
+    buildings_in, buildings_out, rivers = toLatLon(buildings_in, buildings_out, rivers)
     
-    # Save figure
-    # plt.savefig('02_outputs/plots/' + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + '.svg', format='svg', orientation='landscape')
+    renderFigure(buildings_in, buildings_out, rivers)
 
-
-
+    # plt.savefig('mapcompare/outputs/non-interactive/geoplot (' + db_name + ').svg', format='svg', orientation='landscape')
