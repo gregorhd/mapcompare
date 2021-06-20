@@ -18,6 +18,7 @@ An MSc thesis at Ulster University.
 The Python visualisation landscape is highly complex and interconnected. The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v=FytuB8nFHPQ), highlighting long-listed packages or libraries with geospatial functionalities (find an interactive mind map [here]( https://www.mindomo.com/mindmap/d932a80b26bc4cc59d0729ccb6a01a2b)). The landscape broadly clusters around a non-interactive track, primarily interfacing with *matplotlib*, and an interactive track relying on *Javascript* or *OpenGL*.
 
 ![The Python visualisation landscape](python_viz_landscape.png)
+
 For the purpose of this study, the provisional long list of libraries and packages includes:
 | **Non-interactive** | **Interactive** |
 |--|--|
