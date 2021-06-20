@@ -3,54 +3,23 @@
 Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
 """
 
-import os
-import time
-import functools
-import cProfile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
-
-# Add if adding contextily basemap: 
-    # import requests
-    # import contextily as ctx
-# Add if adding DEMs as basemap: import demload
-# Add if saving figure: from datetime import datetime
-
-def timer(func):
-    """Print runtime of decorated function. Quick option as alternative to cProfile and snakeviz."""
-    @functools.wraps(func)
-    def wrapper_timer(*args, **kwargs):
-        start_time = time.perf_counter()
-        value = func(*args, **kwargs)
-        end_time = time.perf_counter() 
-        run_time = end_time - start_time
-        print(f"\nFinished {func.__name__!r} in {run_time:.4f} secs")
-        return value
-    return wrapper_timer
+from mapcompare.cProfile_viz import to_cProfile
+import requests
+import contextily as ctx
 
 
-def to_cProfile(func):
-    """Create cProfile of wrapped function."""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        p = cProfile.Profile()
-        p.enable()
-
-        value = func(*args, **kwargs)
-
-        p.disable()
-        p.dump_stats("mapcompare/profiles/non-interactive/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
-        
-        print(f"\ncProfile created in mapcompare/profiles/non-interactive/ for {func.__name__!r} in module {os.path.basename(__file__)}")
-        return value
-    return wrapper
+viz_type = 'non-interactive/'
+basemap = True
 
 
-def renderFigure(buildings_in, buildings_out, rivers):
+@to_cProfile
+def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False):
 
     def getBBox(*gdfs):
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
@@ -82,7 +51,7 @@ def renderFigure(buildings_in, buildings_out, rivers):
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
 
     ax.set_extent(carto_extent, crs=crs)
-    ax.set_title("Visualisation Task Demo using GeoPandas/Cartopy and contextily" + "\n", fontsize=20)
+    ax.set_title("Visualisation Task Demo using cartopy's add_geometries()" + "\n", fontsize=20)
     
     # Add features to Axes with cartopy add_geometries()
     
@@ -90,19 +59,14 @@ def renderFigure(buildings_in, buildings_out, rivers):
     ax.add_geometries(buildings_out.geometry, crs, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
     ax.add_geometries(rivers.geometry, crs, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
-    """
-    # Add contextily basemap
-    
-    try:
-        ctx.add_basemap(ax, crs=rivers.crs.to_string(), source=ctx.providers.Stamen.TerrainBackground)
-    except requests.HTTPError:
-        print("Contextily: No tiles found. Zoom level likely too high. Setting zoom level to 13.")
-        ctx.add_basemap(ax, zoom=13, crs=rivers.crs.to_string(), source=ctx.providers.Stamen.TerrainBackground)
-    """
-    # OPTIONAL instead of contextily: Add 20m DEMs
-    # csvpath = 'c:\Users\grego\OneDrive\01_GIS\11_MSc\00_Project\01_data\02_DEM\DGM20\dgm25_akt.csv'
-    # data_dir = '01_data/02_DEM/DGM20/'
-    # handles, ax = demload.showDEMs(csvpath, data_dir, carto_extent, ax, crs)
+    if basemap:
+        try:
+            ctx.add_basemap(ax, crs=rivers.crs.to_string(), source=ctx.providers.OpenStreetMap.Mapnik)
+        except requests.HTTPError:
+            print("Contextily: No tiles found. Zoom level likely too high. Setting zoom level to 13.")
+            ctx.add_basemap(ax, zoom=13, crs=rivers.crs.to_string(), source=ctx.providers.OpenStreetMap.Mapnik)
+    else:
+        pass
     
     # Legend
 
@@ -115,15 +79,18 @@ def renderFigure(buildings_in, buildings_out, rivers):
 
     leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 
-if __name__ == "__main__":
-    db_name = 'dd_subset' # 'dd' is the complete dataset, 'dd_subset' is the subset for testing
-    
-    buildings_in, buildings_out, rivers = sql2gdf(db_name, password) # 1min 55 secs
+    if savefig:
+        plt.savefig("mapcompare/outputs/" + viz_type + "cartopy (" + db_name + ").svg", format='svg', orientation='landscape')
+    else:
+        pass
 
-    renderFigure(buildings_in, buildings_out, rivers)
+if __name__ == "__main__":
+    db_name = 'dd_subset'
+    basemap = True
     
-    # Save figure
-    # plt.savefig('mapcompare/outputs/non-interactive/cartopy (' + db_name + ').svg', format='svg', orientation='landscape')
+    buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
+
+    renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False)
 
 
 

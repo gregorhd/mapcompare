@@ -1,11 +1,10 @@
-"""Plot figure using GeoPandas' GeoDataFrame.plot() interface to matplotlib.
+"""Plot figure using geoplot's polyplot() interface to matplotlib.
 
 Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
 """
 
 import os
-import time
-import functools
+from functools import wraps
 import cProfile
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,21 +14,13 @@ import geoplot.crs as gcrs
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 
-def timer(func):
-    """Print runtime of decorated function. Quick option as alternative to cProfile."""
-    @functools.wraps(func)
-    def wrapper_timer(*args, **kwargs):
-        start_time = time.perf_counter()
-        value = func(*args, **kwargs)
-        end_time = time.perf_counter() 
-        run_time = end_time - start_time
-        print(f"\nFinished {func.__name__!r} in {run_time:.4f} secs")
-        return value
-    return wrapper_timer
+viz_type = 'non-interactive/'
+
+# TODO Implement gplt.webmap() option
 
 def to_cProfile(func):
     """Create cProfile of wrapped function."""
-    @functools.wraps(func)
+    @wraps(func)
     def wrapper(*args, **kwargs):
         p = cProfile.Profile()
         p.enable()
@@ -54,7 +45,7 @@ def toLatLon(*gdfs):
     return li
 
 
-def renderFigure(buildings_in, buildings_out, rivers):
+def renderFigure(buildings_in, buildings_out, rivers, savefig=False):
     
     def getBBox(*gdfs):
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
@@ -97,14 +88,17 @@ def renderFigure(buildings_in, buildings_out, rivers):
 
     leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 
+    if savefig:
+        plt.savefig("mapcompare/outputs/" + viz_type + "geoplot (" + db_name + ").svg", format="svg", orientation="landscape")
+    else:
+        pass
+
 if __name__ == "__main__":
 
-    db_name = 'dd_subset' # 'dd' is the complete dataset, 'dd_subset' is the subset for testing
+    db_name = 'dd_subset'
     
-    buildings_in, buildings_out, rivers = sql2gdf(db_name, password) # 1min 55 secs
+    buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
 
     buildings_in, buildings_out, rivers = toLatLon(buildings_in, buildings_out, rivers)
     
-    renderFigure(buildings_in, buildings_out, rivers)
-
-    # plt.savefig('mapcompare/outputs/non-interactive/geoplot (' + db_name + ').svg', format='svg', orientation='landscape')
+    renderFigure(buildings_in, buildings_out, rivers, savefig=False)

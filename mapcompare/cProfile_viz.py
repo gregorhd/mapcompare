@@ -1,12 +1,40 @@
 """Create bar chart of total cProfile run time of renderFigure across all tested libraries or display snakeviz icicle graph in browser for individual libraries.
 """
 
+import os
 import io
+import cProfile
+from functools import wraps
 import pstats
 import pandas as pd
 import glob
 from datetime import datetime
 import matplotlib.pyplot as plt
+
+viz_type = 'interactive/'
+basemap = True
+
+def to_cProfile(func):
+    """Create cProfile for the wrapped function if no basemap is added.
+    
+    This is to avoid tile loading affecting performance measurement of the core rendering functionality.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if basemap:
+            return func(*args, **kwargs)
+        else:
+            p = cProfile.Profile()
+            p.enable()
+
+            value = func(*args, **kwargs)
+
+            p.disable()
+            p.dump_stats("mapcompare/profiles/" + viz_type + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
+            
+            print(f"\ncProfile created in mapcompare/profiles/" + viz_type + " for {}() in module {}".format(func.__name__, os.path.basename(__file__)))
+            return value
+    return wrapper
 
 if __name__ == "__main__":
 

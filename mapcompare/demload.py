@@ -150,3 +150,13 @@ def showDEMs(csvpath, data_dir, carto_extent, ax, crs):
             handle = ax.imshow(img[0], transform=crs, cmap='Greens', vmin=_vmin, vmax=_vmax, extent=img_extent)
     
     return handle, ax
+
+"""Add to gpd.py or carto.py
+
+import demload 
+
+csvpath = 'c:\Users\grego\OneDrive\01_GIS\11_MSc\00_Project\01_data\02_DEM\DGM20\dgm25_akt.csv'
+data_dir = '../01_data/02_DEM/DGM20/'
+handles, ax = demload.showDEMs(csvpath, data_dir, carto_extent, ax, crs)
+
+"""
