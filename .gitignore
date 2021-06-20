@@ -360,3 +360,4 @@ MigrationBackup/
 01_data/
 02_outputs/
 mapcompare/misc/
+mapcompare/outputs/
