@@ -3,9 +3,9 @@
   
   
 
-# pyviz-mapcompare
+# mapcompare
 
-Comparison of Python libraries for creating non-interactive and interactive visualisations of large geospatial vector datasets (n=140,000+).
+Comparison of Python libraries for creating both static and interactive visualisations of large geospatial vector data (n=140,000+).
 
   
 
@@ -15,12 +15,12 @@ An MSc thesis at Ulster University.
 
 ## Which visualisation libraries are included in the comparison?
 
-The Python visualisation landscape is highly complex and interconnected. The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v=FytuB8nFHPQ), highlighting long-listed packages or libraries with geospatial functionalities (find an interactive mind map [here]( https://www.mindomo.com/mindmap/d932a80b26bc4cc59d0729ccb6a01a2b)). The landscape broadly clusters around a non-interactive track, primarily interfacing with *matplotlib*, and an interactive track relying on *Javascript* or *OpenGL*.
+The Python visualisation landscape is highly complex and interconnected. The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v=FytuB8nFHPQ), highlighting long-listed packages or libraries with geospatial functionalities (find an interactive mind map [here]( https://www.mindomo.com/mindmap/d932a80b26bc4cc59d0729ccb6a01a2b)). The landscape broadly clusters around a static track, primarily interfacing with *matplotlib*, and an interactive track relying on *Javascript* or *OpenGL*.
 
 ![The Python visualisation landscape](python_viz_landscape.png)
 
 For the purpose of this study, the provisional long list of libraries and packages includes:
-| **Non-interactive** | **Interactive** |
+| **Static** | **Interactive** |
 |--|--|
 | (1) *GeoPandas*, (2) *cartopy*, (3) *geoplot*, (4) *datashader/holoviews*, (5) *geoviews*, (6) *Altair*. | (1) *Bokeh*, (2) *plotly/dash*, (3) *datashader/holoviews*, (4) *geoviews*, (5) *Altair*, (6) *folium*, (7) *mplleaflet*, (8) *geoplotlib*.  |
 
@@ -28,7 +28,7 @@ For the purpose of this study, the provisional long list of libraries and packag
 
   
 
-A visualisation task common in urban development will be performed across both the non-interactive and interactive track. A 144,727 polygon dataset, located in two tables of a PostGIS database containing the city of Dresden's real-estate cadastre, is queried, returning three sets of results tables which are converted to GeoDataFrames to serve as inputs to the visualisation libraries. 
+A visualisation task common in urban development will be performed across both the static and interactive track. A 144,727 polygon dataset, located in two tables of a PostGIS database containing the city of Dresden's real-estate cadastre, is queried, returning three sets of results tables which are converted to GeoDataFrames to serve as inputs to the visualisation libraries. 
 
 The figure below is a sample visualisation of the dataset using GeoPandas' **GeoDataFrame.plot()** method.
 

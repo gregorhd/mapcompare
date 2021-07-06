@@ -1,11 +1,12 @@
 """Plot figure using geoplot's polyplot() interface to matplotlib.
 
-Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
+Create cProfile of the plotting task only if no basemap is added.
+    
+This is to avoid tile loading affecting performance measurement of the core rendering functionality.
 """
 
-import os
+
 from functools import wraps
-import cProfile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -13,26 +14,15 @@ import geoplot as gplt
 import geoplot.crs as gcrs
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
+from mapcompare.cProfile_viz import to_cProfile
 
-viz_type = 'non-interactive/'
+viz_type = 'static/' # type non-adjustable
 
-# TODO Implement gplt.webmap() option
+# INPUTS
+db_name = 'dd_subset' 
+basemap = False
+savefig = False
 
-def to_cProfile(func):
-    """Create cProfile of wrapped function."""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        p = cProfile.Profile()
-        p.enable()
-
-        value = func(*args, **kwargs)
-
-        p.disable()
-        p.dump_stats("mapcompare/profiles/non-interactive/" + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
-        
-        print(f"\ncProfile created in mapcompare/profiles/non-interactive/ for {func.__name__!r} in module {os.path.basename(__file__)}")
-        return value
-    return wrapper
 
 def toLatLon(*gdfs):
     """Convert GDFs to geographic coordinates as expected by geoplot
@@ -45,10 +35,11 @@ def toLatLon(*gdfs):
     return li
 
 
-def renderFigure(buildings_in, buildings_out, rivers, savefig=False):
+@to_cProfile
+def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
     
     def getBBox(*gdfs):
-        """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
+        """Return combined bbox of all GDFs in format x0, y0, x1, y1.
         """
 
         list_of_bounds = []
@@ -62,20 +53,26 @@ def renderFigure(buildings_in, buildings_out, rivers, savefig=False):
         ymax = np.max([item[3] for item in list_of_bounds])
         
         # geoplot order different from cartopy order
-        carto_extent = [xmin, ymin, xmax, ymax]
+        extent = [xmin, ymin, xmax, ymax]
         
-        return carto_extent
+        return extent
 
      # Get number of features per GDF, to display in legend
     buildings_in_no = str(len(buildings_in.index))
     buildings_out_no = str(len(buildings_out.index))
     rivers_no = str(len(rivers.index))
 
-    carto_extent = getBBox(buildings_in, buildings_out, rivers)
+    extent = getBBox(buildings_in, buildings_out, rivers)
 
-    ax = gplt.polyplot(buildings_in, extent=carto_extent, projection=gcrs.Mercator(), facecolor='red', figsize=(20, 10))
-    gplt.polyplot(buildings_out, ax=ax, projection=gcrs.Mercator(), facecolor='lightgrey', edgecolor='black', linewidth=0.1)
-    gplt.polyplot(rivers, ax=ax, projection=gcrs.Mercator(), facecolor='lightblue', edgecolor='blue', linewidth=0.25)
+    if basemap:
+        ax = gplt.webmap(buildings_in, extent=extent, projection=gcrs.WebMercator(), figsize=(20, 10))
+        gplt.polyplot(buildings_in, ax=ax, facecolor='red', zorder=3)
+        gplt.polyplot(buildings_out, ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1, zorder=2)
+        gplt.polyplot(rivers, ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25, zorder=1)
+    else:
+        ax = gplt.polyplot(buildings_in, extent=extent, projection=gcrs.Mercator(), facecolor='red', figsize=(20, 10))
+        gplt.polyplot(buildings_out, ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+        gplt.polyplot(rivers, ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
     # Legend
 
@@ -95,10 +92,8 @@ def renderFigure(buildings_in, buildings_out, rivers, savefig=False):
 
 if __name__ == "__main__":
 
-    db_name = 'dd_subset'
-    
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
 
     buildings_in, buildings_out, rivers = toLatLon(buildings_in, buildings_out, rivers)
     
-    renderFigure(buildings_in, buildings_out, rivers, savefig=False)
+    renderFigure(buildings_in, buildings_out, rivers)

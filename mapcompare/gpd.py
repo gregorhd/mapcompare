@@ -6,6 +6,7 @@ This is to avoid tile loading affecting performance measurement of the core rend
 """
 
 import numpy as np
+import contextily as ctx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
@@ -13,15 +14,18 @@ from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 import requests
-import contextily as ctx
 
 
-viz_type = 'non-interactive/'
-basemap = True
+viz_type = 'static/' # type non-adjustable
+
+# INPUTS
+db_name = 'dd_subset' 
+basemap = False
+savefig = False
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False):
+def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False, db_name=db_name, viz_type=viz_type):
 
     def getBBox(*gdfs):
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
@@ -53,7 +57,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=F
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
 
     ax.set_extent(carto_extent, crs=crs)
-    ax.set_title("Visualisation Task Demo using GeoPandas's plot()'" + "\n", fontsize=20)
+    ax.set_title("Matplotlib interface: GeoPandas's .plot()'" + "\n", fontsize=20)
     
     # Add features to Axes
     
@@ -87,12 +91,10 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=F
         pass
 
 if __name__ == "__main__":
-    db_name = 'dd_subset'
-    basemap = True
-    
+
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
     
-    renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False)
+    renderFigure(buildings_in, buildings_out, rivers)
 
 
 

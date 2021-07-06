@@ -1,44 +1,49 @@
 """Create bar chart of total cProfile run time of renderFigure across all tested libraries or display snakeviz icicle graph in browser for individual libraries.
 """
 
+import wrapt
 import os
 import io
+import re
+import inspect
 import cProfile
-from functools import wraps
 import pstats
 import pandas as pd
 import glob
 from datetime import datetime
 import matplotlib.pyplot as plt
 
-viz_type = 'interactive/'
-basemap = True
 
-def to_cProfile(func):
-    """Create cProfile for the wrapped function if no basemap is added.
+
+@wrapt.decorator
+def to_cProfile(func, instance, args, kwargs):
+    """Create cProfile of the wrapped function only if no basemap is added.
     
     This is to avoid tile loading affecting performance measurement of the core rendering functionality.
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if basemap:
-            return func(*args, **kwargs)
-        else:
-            p = cProfile.Profile()
-            p.enable()
+    
+    if str(inspect.signature(func).parameters['basemap'])[-5:] == 'False':
 
-            value = func(*args, **kwargs)
+        db_name = re.findall(r"'(.*?)'", str(inspect.signature(func).parameters['db_name']).split('=')[1])[0]
+        viz_type = re.findall(r"'(.*?)'", str(inspect.signature(func).parameters['viz_type']).split('=')[1])[0]
+        
+        p = cProfile.Profile()
+        p.enable()
 
-            p.disable()
-            p.dump_stats("mapcompare/profiles/" + viz_type + os.path.basename(__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
-            
-            print(f"\ncProfile created in mapcompare/profiles/" + viz_type + " for {}() in module {}".format(func.__name__, os.path.basename(__file__)))
-            return value
-    return wrapper
+        value = func(*args, **kwargs)
+
+        p.disable()
+        p.dump_stats("mapcompare/profiles/" + viz_type + os.path.basename(inspect.getmodule(func).__file__)[:-3] + ' ' + '(' + db_name + ')' + ".prof")
+        
+        print(f"\ncProfile created in mapcompare/profiles/" + viz_type + " for {}() in module {}".format(func.__name__, os.path.basename(inspect.getmodule(func).__file__)))
+        return value
+    
+    else:
+        return func(*args, **kwargs)
 
 if __name__ == "__main__":
 
-    profiledir = 'mapcompare/profiles/non-interactive/'
+    profiledir = 'mapcompare/profiles/static/'
 
     # Set database name to compare results from either the complete or subset db
 

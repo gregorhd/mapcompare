@@ -1,9 +1,12 @@
 """Plot figure using cartopy's GeoAxes.add_geometries() interface to matplotlib.
 
-Create a cProfile of the renderFigure() function, if decorator @to_cProfile is set.
+Create cProfile of the plotting task only if no basemap is added.
+    
+This is to avoid tile loading affecting performance measurement of the core rendering functionality.
 """
 
 import numpy as np
+import contextily as ctx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
@@ -11,15 +14,17 @@ from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 import requests
-import contextily as ctx
 
+viz_type = 'static/' # type non-adjustable
 
-viz_type = 'non-interactive/'
-basemap = True
+# INPUTS
+db_name = 'dd_subset' 
+basemap = False
+savefig = False
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False):
+def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False, db_name=db_name, viz_type=viz_type):
 
     def getBBox(*gdfs):
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
@@ -51,7 +56,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=F
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
 
     ax.set_extent(carto_extent, crs=crs)
-    ax.set_title("Visualisation Task Demo using cartopy's add_geometries()" + "\n", fontsize=20)
+    ax.set_title("Matplotlib interface: cartopy's .add_geometries()" + "\n", fontsize=20)
     
     # Add features to Axes with cartopy add_geometries()
     
@@ -85,12 +90,10 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=F
         pass
 
 if __name__ == "__main__":
-    db_name = 'dd_subset'
-    basemap = True
     
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
 
-    renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False)
+    renderFigure(buildings_in, buildings_out, rivers)
 
 
 

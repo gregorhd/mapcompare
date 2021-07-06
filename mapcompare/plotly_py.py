@@ -1,3 +1,10 @@
+"""Plot figure using plotly.py's express.choropleth() (without basemap) or express.choropleth_mapbox() methods (with basemap).
+
+Create cProfile of the plotting task only if no basemap is added.
+    
+This is to avoid tile loading affecting performance measurement of the core rendering functionality.
+"""
+
 import json
 import numpy as np
 import plotly.express as px
@@ -5,11 +12,15 @@ from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 
-viz_type = 'interactive/'
-basemap = True
+viz_type = 'interactive/' # type non-adjustable
 
-def prepData(buildings_in, buildings_out, rivers):
-    """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() method.
+# INPUTS
+db_name = 'dd_subset' 
+basemap = False
+savefig = False
+
+def prepGDFs(buildings_in, buildings_out, rivers):
+    """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() methods.
 
     This step is separated from actual rendering to not affect performance measurement. 
     """
@@ -47,8 +58,9 @@ def prepData(buildings_in, buildings_out, rivers):
 
     return merged
 
+
 @to_cProfile
-def renderFigure(merged, basemap=basemap, savefig=False):
+def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
     """Renders polygons using ploty.py's express.choropleth() method, if not adding a basemap, or its express.choropleth_mapbox() method otherwise.
     """
     def get_zoom_mercator(minlon, maxlon, minlat, maxlat, width_to_height):
@@ -75,6 +87,8 @@ def renderFigure(merged, basemap=basemap, savefig=False):
 
         return round(min(lon_zoom, lat_zoom))
 
+    title = 'Click on a legend entry to hide/unhide features'
+
     if basemap:
         
         # Determine opimtal view vars for Mapbox base map, which is currently not automated
@@ -86,21 +100,19 @@ def renderFigure(merged, basemap=basemap, savefig=False):
         # Plot with tile map using px.choropleth_mapbox()
         # This seems to always require a .json temp file
 
-        merged.to_file("mapcompare\\temp\\" + viz_type + "plotly_py (dd_subset).json", driver='GeoJSON')
+        merged.to_file("mapcompare\\temp\\" + viz_type + "plotly_py (" + db_name + ").json", driver='GeoJSON')
 
         with open("mapcompare\\temp\\" + viz_type + "plotly_py (dd_subset).json") as f:
             geojson = json.load(f)
 
-        fig = px.choropleth_mapbox(merged, geojson=geojson, locations=merged['id'], title="Click on a legend entry to hide/unhide features", color=merged['Legend'], color_discrete_map={
+        fig = px.choropleth_mapbox(merged, geojson=geojson, locations=merged['id'], title=title, color=merged['Legend'], color_discrete_map={
         'Building within 500m of river/stream':'red',
         'Building outside 500m of river/stream':'lightgrey',
         'River/stream':'lightblue'}, hover_data={'id': False, 'Legend': False, 'Building use':True}, mapbox_style="open-street-map", center={'lat': centery, 'lon': centerx}, zoom=zoom, featureidkey='properties.id')
         
         fig.update_geos(projection_type="mercator")
-        fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0}, title_text='Click on a legend entry to hide/unhide features', title_font_size=12)
+        fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0}, title_text=title, title_font_size=12)
     
-        fig.show()
-
     else:
         # Plot without tile map using px.choropleth() which does not require
         # a .json as a temp file, instead it reads straight from GDF
@@ -111,8 +123,9 @@ def renderFigure(merged, basemap=basemap, savefig=False):
             'River/stream':'lightblue'}, hover_data={'id': False, 'Legend': False, 'Building use':True})
 
         fig.update_geos(fitbounds="locations", projection_type="mercator")
-        fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0}, title_text='Click on a legend entry to hide/unhide features', title_font_size=12)
-        fig.show()
+        fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0}, title_text=title, title_font_size=12)
+    
+    fig.show()
     
     if savefig:
 
@@ -122,11 +135,9 @@ def renderFigure(merged, basemap=basemap, savefig=False):
         pass
     
 if __name__ == "__main__":
-    db_name = 'dd_subset'
-    basemap = True
-
+    
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
 
-    merged = prepData(buildings_in, buildings_out, rivers)
+    merged = prepGDFs(buildings_in, buildings_out, rivers)
 
-    renderFigure(merged, basemap=basemap, savefig=False)
+    renderFigure(merged)

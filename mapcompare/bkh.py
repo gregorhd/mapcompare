@@ -1,5 +1,12 @@
-from bokeh.models.ranges import Range1d
+"""Plot figure using Bokeh's figure.patches method.
+
+Create cProfile of the plotting task only if no basemap is added.
+    
+This is to avoid tile loading affecting performance measurement of the core rendering functionality.
+"""
+
 import numpy as np
+from bokeh.models.ranges import Range1d
 from bokeh.io import output_file, show
 from bokeh.models import GeoJSONDataSource, Range1d
 from bokeh.plotting import figure
@@ -8,13 +15,29 @@ from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 from bokeh.tile_providers import OSM, get_provider
 
-viz_type = 'interactive/'
-basemap = True
+viz_type = 'interactive/' # type non-adjustable
+
+# INPUTS
+db_name = 'dd_subset'
+basemap = False
+savefig = False
+
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False):
+def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
     """Renders polygons using Bokeh's plotting.figure.patches() method.
     """
+    def gdf2webmercator(*gdfs):
+        """Convert GDFs to Web Mercator (required only if adding basemap)
+        """
+
+        li = []
+        for gdf in gdfs:
+            gdf = gdf.to_crs(epsg=3857)
+            li.append(gdf)
+        
+        return li
+    
     def getBBox(*gdfs):
             """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
             """
@@ -32,17 +55,6 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=F
             extent = [xmin, xmax, ymin, ymax]
             
             return extent
-    
-    def gdf2webmercator(*gdfs):
-        """Convert GDFs to Web Mercator (required only if adding basemap)
-        """
-
-        li = []
-        for gdf in gdfs:
-            gdf = gdf.to_crs(epsg=3857)
-            li.append(gdf)
-        
-        return li
 
     if basemap:
         
@@ -100,10 +112,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=F
 
 if __name__ == "__main__":
 
-    db_name = 'dd_subset'
-    basemap = False
-
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
 
-    renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=False)
+    renderFigure(buildings_in, buildings_out, rivers)
 
