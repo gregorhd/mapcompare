@@ -1,4 +1,8 @@
-# %%
+"""Fetch three GDFs from PostGIS database containing the city of Dresden's real estate cadastre, returning:
+    - all buildings within 500m of a river/stream, and their building use (simplified schema in English)
+    - all buildings outside 500m of a river/stream, and their building use (simplified schema in English)
+    - all rivers, streams and canals
+"""
 import numpy as np
 import geopandas as gpd
 from sqlalchemy import create_engine
@@ -10,6 +14,7 @@ def timer(func):
     """Print runtime of decorated function courtesy of RealPython's Primer on Python Decorators: https://realpython.com/primer-on-python-decorators/"""
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
+
         start_time = time.perf_counter()
         value = func(*args, **kwargs)
         end_time = time.perf_counter() 
@@ -45,7 +50,3 @@ def sql2gdf(db_name, password):
     rivers = gpd.GeoDataFrame.from_postgis(sql3, con, crs='epsg:25833')
 
     return buildings_in, buildings_out, rivers
-
-
-
-# %%

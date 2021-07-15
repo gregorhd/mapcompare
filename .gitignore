@@ -359,4 +359,6 @@ MigrationBackup/
 # Other directories
 01_data/
 mapcompare/misc/
+mapcompare/outputs/
+mapcompare/temp/
 
