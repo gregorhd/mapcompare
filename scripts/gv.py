@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-"""Plot figure using GeoViews' Polygons class and utilizing either the Bokeh or matplotlib backend.
+"""UNDER CONSTRUCTION: Plot figure using GeoViews' Polygons class and utilizing either the Bokeh or matplotlib backend.
 
-Create cProfile of the plotting task only if no basemap is added.
-    
-This is to avoid tile loading affecting performance measurement of the core rendering functionality.
+Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
+This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
-# TODO Matplotlib backend.
+# TODO Optimise performance.
+# TODO Add legend and basemap
+# TODO Refine Matplotlib implementation.
 
 import numpy as np
 import geoviews as gv
@@ -16,7 +18,7 @@ from bokeh.plotting import show
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
-from cartopy import crs as ccrs
+# from cartopy import crs as ccrs
 
 
 gv.extension('bokeh', 'matplotlib')

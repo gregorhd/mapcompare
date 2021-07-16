@@ -2,10 +2,16 @@
 
 """Plot figure using HoloViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
 
+Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
+This is to avoid tile loading affecting performance measurement of the core plotting task.
+
+Running this script as is, will produce a static rasterisation of the polygons, which will not be updated when zooming in.
+
 To have datashader re-calculate the rasterized polygons with every zoom and pan, 
-run this script as part of a live Bokeh server by entering in the command line 'bokeh serve --show hv_ds.py'.
+cd to apps/hv_ds/ via the command line and enter 'bokeh serve --show main.py'.
 """
-import numpy as np
+
 import holoviews as hv
 from spatialpandas import GeoDataFrame
 import datashader as ds
@@ -28,32 +34,11 @@ basemap = True
 savefig = False
 
 def prepGDFs(*gdfs):
-    """Prepare GeoDataFrames for use by datashader's transfer_functions.shade() method.
+    """Prepare GeoDataFrames for use by HoloViews' Polygons class.
 
     This step is separated from actual rendering to not affect performance measurement. 
     """
-    def getBBox(*gdfs):
-        """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
-        """
 
-        list_of_bounds = []
-        for gdf in gdfs:
-            gdf_bounds = gdf.total_bounds
-            list_of_bounds.append(gdf_bounds)
-            
-        xmin = np.min([item[0] for item in list_of_bounds])
-        xmax = np.max([item[2] for item in list_of_bounds])
-        ymin = np.min([item[1] for item in list_of_bounds])
-        ymax = np.max([item[3] for item in list_of_bounds])
-        
-        extent = [xmin, xmax, ymin, ymax]
-        
-        return extent
-    
-    extent = getBBox(*gdfs)
-
-    aspect_ratio = (extent[1] - extent [0]) / (extent[3] - extent[2])
-    
     # transform to webmercator to align with basemap, if added
     li = []
     for gdf in gdfs:
@@ -72,6 +57,10 @@ def prepGDFs(*gdfs):
     merged = merged.append(rivers)
     merged['category'] = merged['category'].astype('category')
     
+    # see else (i.e. not basemap) section below on need for aspect_ratio
+    extent = merged.total_bounds
+    aspect_ratio = (extent[2] - extent [0]) / (extent[3] - extent[1])
+
     spatialpdGDF = GeoDataFrame(merged)
     
     return spatialpdGDF, aspect_ratio
@@ -118,8 +107,6 @@ def renderFigure(spatialpdGDF, db_name=db_name, viz_type=viz_type, basemap=basem
     else:
         pass
     
-    doc = hv.renderer('bokeh').server_doc(layout)
-    doc.title = 'HoloViews + Datashader + Bokeh App'
 
 if __name__ == "__main__":
 

@@ -15,7 +15,7 @@ An MSc thesis at Ulster University.
 
   
 
-The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v=FytuB8nFHPQ), highlighting long-listed packages or libraries with geospatial functionalities (find an interactive mind map of this figure [here]( https://www.mindomo.com/mindmap/d932a80b26bc4cc59d0729ccb6a01a2b)).
+The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v=FytuB8nFHPQ), highlighting long-listed packages or libraries with geospatial functionalities (find an interactive mind map of this figure to view or to copy and edit [here]( https://www.mindomo.com/mindmap/d932a80b26bc4cc59d0729ccb6a01a2b)).
 
  
 
@@ -44,7 +44,7 @@ Short-listed libraries are then compared as follows:
 
   
 
-1. Comparing a range of library metadatea including:
+1. Comparing a range of library metadata including:
 
   
 

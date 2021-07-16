@@ -2,9 +2,9 @@
 
 """Plot figure using cartopy's GeoAxes.add_geometries() interface to matplotlib.
 
-Create cProfile of the plotting task only if no basemap is added.
-    
-This is to avoid tile loading affecting performance measurement of the core rendering functionality.
+Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
+This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
 import numpy as np
