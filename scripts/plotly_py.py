@@ -7,6 +7,7 @@ The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
+import os
 import json
 import numpy as np
 import plotly.express as px
@@ -14,6 +15,7 @@ from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 
+outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
@@ -131,8 +133,10 @@ def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefi
     fig.show()
     
     if savefig:
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
 
-        fig.write_html("mapcompare/outputs/" + viz_type + "plotly_py (" + db_name + ").html")
+        fig.write_html(outputdir + viz_type + "plotly_py (" + db_name + ").html")
     
     else:
         pass

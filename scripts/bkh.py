@@ -7,6 +7,7 @@ Create cProfile of the plotting task only if no basemap is added.
 This is to avoid tile loading affecting performance measurement of the core rendering functionality.
 """
 
+import os
 import numpy as np
 from bokeh.models.ranges import Range1d
 from bokeh.io import output_file, show
@@ -17,6 +18,7 @@ from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 from bokeh.tile_providers import OSM, get_provider
 
+outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
@@ -106,7 +108,10 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     p.legend.click_policy="hide"
 
     if savefig:
-        output_file(filename="mapcompare/outputs/" + viz_type + "bokeh" + " (" + db_name + ").html")
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
+
+        output_file(filename=outputdir + viz_type + "bokeh" + " (" + db_name + ").html")
     else:
         pass
 

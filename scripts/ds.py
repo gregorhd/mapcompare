@@ -2,6 +2,7 @@
 
 """Plot figure using datashader's tf.shade() method. This, in effect rasterizses the vector data, creating a static image without axes, legend or projection.
 """
+import os
 import numpy as np
 from spatialpandas import GeoDataFrame
 import datashader as ds
@@ -11,6 +12,7 @@ from mapcompare.cProfile_viz import to_cProfile
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 
+outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # not adjustable
 basemap = False # not adjustable
 
@@ -68,7 +70,10 @@ def renderFigure(spatialpdGDF, extent, db_name=db_name, viz_type=viz_type, basem
     tf.shade(agg, color_key=color_key)
 
     if savefig:
-        utils.export_image(tf.shade(agg, color_key=color_key), filename="mapcompare/outputs/" + viz_type + "datashader only" + " (" + db_name + ")")
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
+
+        utils.export_image(tf.shade(agg, color_key=color_key), filename=outputdir + viz_type + "datashader only" + " (" + db_name + ")")
     else:
         pass
 

@@ -67,10 +67,10 @@ if __name__ == "__main__":
     df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime']
 
     if viz_type == 'interactive/':
-        rename_dict = {'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'hv_ds': 'HoloViews+\ndatashader+\nBokeh'}
+        rename_dict = {'alt': 'Altair', 'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'hv_ds': 'HoloViews+\ndatashader+\nBokeh'}
     
     else:
-        rename_dict = {'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews', 'ds': 'Datashader'}
+        rename_dict = {'alt': 'Altair', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib'}
         
 
     df1['library'].replace(rename_dict, inplace=True)

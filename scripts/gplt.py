@@ -9,8 +9,7 @@ The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
-
-from functools import wraps
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -20,6 +19,7 @@ from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 
+outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
@@ -90,7 +90,10 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 
     if savefig:
-        plt.savefig("mapcompare/outputs/" + viz_type + "geoplot (" + db_name + ").svg", format="svg", orientation="landscape")
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
+
+        plt.savefig(outputdir + viz_type + "geoplot (" + db_name + ").svg", format="svg", orientation="landscape")
     else:
         pass
 

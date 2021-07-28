@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-"""UNDER CONSTRUCTION: Plot figure using GeoViews' Polygons class and utilizing either the Bokeh or matplotlib backend.
+"""Plot figure using GeoViews' Polygons class and utilizing either the Bokeh or matplotlib backend.
 
 Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
-# TODO Optimise performance.
-# TODO Add legend and basemap
-# TODO Refine Matplotlib implementation.
+# TODO Optimise performance (the slowest library thus far).
+# TODO Add legend and basemap for static viz_type
 
+import os
 import numpy as np
 import geoviews as gv
 from geoviews import opts
@@ -20,11 +20,11 @@ from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 # from cartopy import crs as ccrs
 
-
+outputdir = 'mapcompare/outputs/'
 gv.extension('bokeh', 'matplotlib')
 
 # INPUTS
-viz_type = 'interactive/'
+viz_type = 'static/'
 db_name = 'dd'
 basemap = False
 savefig = True
@@ -93,6 +93,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
         layout = (features * legend).opts(width=700, height=500, title=title)
 
+        gv.operation.resample_geometry(layout)
+
+
         # gv.Element() does not show in VS Code interpreter, hence this workaround with
         # gv.render and bokeh.plotting.show,
         # otherwise use (gv.Overlay(features * legend).opts())
@@ -121,6 +124,8 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
         layout = (features * legend).opts(width=700, height=500, title=title)
 
+        gv.operation.resample_geometry(layout).opts(width=400, height=400)
+
         p = gv.render(layout)
 
         # without basemap, aspect ratio seems to be skewed slightly,
@@ -130,15 +135,15 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         show(p)
         
     elif basemap == False and viz_type == 'static/':           
-        
-        layout = (gv.Polygons(buildings_in, group="buildings_in") * (gv.Polygons(buildings_out, group="buildings_out")) * (gv.Polygons(rivers, group="rivers")))
+    
+        layout = gv.Polygons(buildings_in, roup="buildings_in") * gv.Polygons(buildings_out, group="buildings_out") * gv.Polygons(rivers, group="rivers")
 
         layout.opts(
             opts.Polygons('buildings_in', cmap=['red'], edgecolor='black', linewidth=0.5, xaxis=None, yaxis=None, backend="matplotlib"),
             opts.Polygons('buildings_out', cmap=['lightgrey'], edgecolor='black', linewidth=0.5, backend="matplotlib"),
             opts.Polygons('rivers', backend="matplotlib"),
             opts.Overlay(aspect=aspect_ratio, backend='matplotlib')
-        ) # TODO projection= keyword...???
+        )
         
         gv.output(layout, size=500, fig='svg', backend='matplotlib')
 
@@ -148,9 +153,16 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     
     
     if savefig and viz_type == 'interactive/':
-        gv.save(layout, "mapcompare/outputs/" + viz_type + "geoviews" + " (" + db_name + ").html")
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
+
+        gv.save(layout, outputdir + viz_type + "geoviews" + " (" + db_name + ").html")
+    
     elif savefig and viz_type == 'static/':
-        gv.save(layout, "mapcompare/outputs/" + viz_type + "geoviews" + " (" + db_name + ").svg", backend='matplotlib')
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
+        
+        gv.save(layout, outputdir + viz_type + "geoviews" + " (" + db_name + ").svg", backend='matplotlib')
     
 
 if __name__ == "__main__":

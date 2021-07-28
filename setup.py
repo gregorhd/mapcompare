@@ -11,7 +11,7 @@ setup(name='mapcompare',
       install_requires=[
                         'numpy', 'matplotlib', 'pandas', 'geopandas', 'cartopy',
                         'geoplot', 'geoviews', 'holoviews', 'datashader','bokeh', 'plotly', 'wrapt'],
-      scripts=['scripts/bkh.py', 'scripts/carto.py',
+      scripts=['scripts/alt.py', 'scripts/bkh.py', 'scripts/carto.py',
                'scripts/ds.py', 'scripts/gpd.py',
                'scripts/gplt.py', 'scripts/gv.py',
                'scripts/hv_ds.py', 'scripts/plotly_py.py',

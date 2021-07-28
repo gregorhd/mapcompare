@@ -12,6 +12,7 @@ To have datashader re-calculate the rasterized polygons with every zoom and pan,
 cd to apps/hv_ds/ via the command line and enter 'bokeh serve --show main.py'.
 """
 
+import os
 import holoviews as hv
 from spatialpandas import GeoDataFrame
 import datashader as ds
@@ -26,6 +27,7 @@ from collections import OrderedDict as ODict
 
 hv.extension('bokeh')
 
+outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # not adjustable
 
 # INPUTS
@@ -103,7 +105,10 @@ def renderFigure(spatialpdGDF, db_name=db_name, viz_type=viz_type, basemap=basem
     show(p)
 
     if savefig:
-        hv.save(layout, "mapcompare/outputs/" + viz_type + "holoviews+datashader+bokeh" + " (" + db_name + ").html")
+        if not os.path.exists(outputdir + viz_type):
+            os.makedirs(outputdir + viz_type)
+        
+        hv.save(layout, outputdir + viz_type + "holoviews+datashader+bokeh" + " (" + db_name + ").html")
     else:
         pass
     

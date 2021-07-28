@@ -36,7 +36,7 @@ Provisionally short-listed libraries are indicated in **bold** below.
 
   
 
-A simple visualisation task is performed across both the static and interactive track, and secondly for both a full dataset and a smaller subset. The full dataset contains 144,727 polygons representing the city of Dresden's real-estate cadastre. The subset contains 2,645 polygons. Both databases are queried in PostGIS, returning three sets of results tables which are converted to *GeoPandas* GeoDataFrames to serve as inputs to the visualisation libraries. In some cases, these are converted to the respective supported data formats prior to the actual plotting task.
+A simple visualisation task is performed across both the static and interactive track, and secondly for both the complete dataset and a smaller subset. The complete dataset contains 144,727 polygons representing the city of Dresden's real-estate cadastre. The subset contains 2,645 polygons. Both databases are queried in PostGIS, returning three sets of results tables which are converted to *GeoPandas* GeoDataFrames to serve as inputs to the visualisation libraries. In some cases, these are converted to the respective supported data formats prior to the actual plotting task.
 
   
 
@@ -93,7 +93,7 @@ Short-listed libraries are then compared as follows:
 | ![cProfile comparison - static](comp_static_subset.png) |  ![cProfile comparison - interactive](comp_interactive_subset.png)  |
 
 
-###  Full dataset (feature count: 144,727)
+###  Complete dataset (feature count: 144,727)
 
  
 | **Static** | **Interactive** |
@@ -101,7 +101,7 @@ Short-listed libraries are then compared as follows:
 | ![cProfile comparison - static](comp_static_full.png)  |  ![cProfile comparison - interactive](comp_interactive_full.png) |
   
 
-## Overview of initial outputs
+## Overview of initial outputs (complete dataset)
 
  
 
