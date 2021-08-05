@@ -2,7 +2,7 @@
 
 """Plot figure using HoloViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
 
-Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
+Creates a cProfile of the renderFigure() function encompassing the core plotting task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 
@@ -23,7 +23,7 @@ from mapcompare.misc.pw import password
 from holoviews.operation.datashader import (
     datashade, inspect_polygons
 )
-from collections import OrderedDict as ODict
+
 
 hv.extension('bokeh')
 
@@ -42,12 +42,8 @@ def prepGDFs(*gdfs):
     """
 
     # transform to webmercator to align with basemap, if added
-    li = []
-    for gdf in gdfs:
-        gdf = gdf.to_crs(epsg=3857)
-        li.append(gdf)
 
-    buildings_in, buildings_out, rivers = li
+    buildings_in, buildings_out, rivers = [gdf.to_crs(epsg=3857) for gdf in gdfs]
 
     buildings_in['category'] = 'Buildings within 500m of river/stream'
     buildings_out['category'] = 'Buildings outside 500m of river/stream'
@@ -55,8 +51,7 @@ def prepGDFs(*gdfs):
 
 
     # Merge GDFs and set category column 
-    merged = buildings_in.append(buildings_out)
-    merged = merged.append(rivers)
+    merged = buildings_in.append(buildings_out).append(rivers)
     merged['category'] = merged['category'].astype('category')
     
     # see else (i.e. not basemap) section below on need for aspect_ratio

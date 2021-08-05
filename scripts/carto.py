@@ -23,30 +23,28 @@ viz_type = 'static/' # type non-adjustable
 
 # INPUTS
 db_name = 'dd_subset' 
-basemap = False
+basemap = True
 savefig = False
 
+def getExtent(*gdfs):
+    """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
+
+    This step is separated from actual rendering to not affect performance measurement.
+    """
+
+    list_of_bounds = [gdf.total_bounds for gdf in gdfs]
+        
+    xmin = np.min([item[0] for item in list_of_bounds])
+    xmax = np.max([item[2] for item in list_of_bounds])
+    ymin = np.min([item[1] for item in list_of_bounds])
+    ymax = np.max([item[3] for item in list_of_bounds])
+    
+    extent = [xmin, xmax, ymin, ymax]
+    
+    return extent
 
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
-
-    def getBBox(*gdfs):
-        """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
-        """
-
-        list_of_bounds = []
-        for gdf in gdfs:
-            gdf_bounds = gdf.total_bounds
-            list_of_bounds.append(gdf_bounds)
-            
-        xmin = np.min([item[0] for item in list_of_bounds])
-        xmax = np.max([item[2] for item in list_of_bounds])
-        ymin = np.min([item[1] for item in list_of_bounds])
-        ymax = np.max([item[3] for item in list_of_bounds])
-        
-        carto_extent = [xmin, xmax, ymin, ymax]
-        
-        return carto_extent
     
     # Get number of features per GDF, to display in legend
     buildings_in_no = str(len(buildings_in.index))
@@ -55,11 +53,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
     crs = ccrs.UTM(33)
 
-    carto_extent = getBBox(buildings_in, buildings_out, rivers) # 8 secs
-
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
 
-    ax.set_extent(carto_extent, crs=crs)
+    ax.set_extent(extent, crs=crs)
     ax.set_title("Matplotlib interface: cartopy's .add_geometries()" + "\n", fontsize=20)
     
     # Add features to Axes with cartopy add_geometries()
@@ -99,6 +95,8 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 if __name__ == "__main__":
     
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
+
+    extent = getExtent(buildings_in, buildings_out, rivers)
 
     renderFigure(buildings_in, buildings_out, rivers)
 

@@ -22,51 +22,35 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd'
-basemap = False
+db_name = 'dd_subset'
+basemap = True
 savefig = False
 
+
+def prepGDFs(*gdfs):
+    """Convertes GDFs to Web Mercator to line up with tiled basemaps fetched by Bokeh. Returns combined bounding box (extent) and aspect_ratio.
+    """
+    gdfs = [gdf.to_crs(epsg=3857) for gdf in gdfs]
+
+    list_of_bounds = [gdf.total_bounds for gdf in gdfs]
+        
+    xmin = np.min([item[0] for item in list_of_bounds])
+    xmax = np.max([item[2] for item in list_of_bounds])
+    ymin = np.min([item[1] for item in list_of_bounds])
+    ymax = np.max([item[3] for item in list_of_bounds])
+    
+    extent = [xmin, xmax, ymin, ymax]
+
+    aspect_ratio = (extent[1] - extent [0]) / (extent[3] - extent[2])
+
+    return (gdfs, extent, aspect_ratio)
 
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
     """Renders polygons using Bokeh's plotting.figure.patches() method.
     """
-    def gdf2webmercator(*gdfs):
-        """Convert GDFs to Web Mercator (required only if adding basemap)
-        """
-
-        li = []
-        for gdf in gdfs:
-            gdf = gdf.to_crs(epsg=3857)
-            li.append(gdf)
-        
-        return li
     
-    def getBBox(*gdfs):
-            """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
-            """
-
-            list_of_bounds = []
-            for gdf in gdfs:
-                gdf_bounds = gdf.total_bounds
-                list_of_bounds.append(gdf_bounds)
-                
-            xmin = np.min([item[0] for item in list_of_bounds])
-            xmax = np.max([item[2] for item in list_of_bounds])
-            ymin = np.min([item[1] for item in list_of_bounds])
-            ymax = np.max([item[3] for item in list_of_bounds])
-            
-            extent = [xmin, xmax, ymin, ymax]
-            
-            return extent
-
     if basemap:
-        
-        buildings_in, buildings_out, rivers = gdf2webmercator(buildings_in, buildings_out, rivers)
-
-        extent = getBBox(buildings_in, buildings_out, rivers)
-
-        aspect_ratio = (extent[1] - extent [0]) / (extent[3] - extent[2])
         
         p = figure(title="Click on a legend entry to hide/unhide features",
             aspect_ratio=aspect_ratio,
@@ -80,10 +64,6 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         p.add_tile(get_provider(OSM))
     
     else:
-        
-        extent = getBBox(buildings_in, buildings_out, rivers)
-
-        aspect_ratio = (extent[1] - extent [0]) / (extent[3] - extent[2])
         
         p = figure(title="Click on a legend entry to hide/unhide features",
             aspect_ratio=aspect_ratio,
@@ -120,6 +100,8 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 if __name__ == "__main__":
 
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
+
+    ((buildings_in, buildings_out, rivers), extent, aspect_ratio) = prepGDFs(buildings_in, buildings_out, rivers)
 
     renderFigure(buildings_in, buildings_out, rivers)
 

@@ -15,9 +15,9 @@ as Altair Saver blocks the interpreter between runs until the browser tab is clo
 """
 
 import os
-import altair as  alt
+import altair as alt
+import altair_viewer
 import json
-import numpy as np
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
@@ -39,7 +39,7 @@ viz_type = 'static/'
 
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 
 
 # allgedly works in vscode with this renderer, though no luck yet
@@ -48,30 +48,19 @@ db_name = 'dd_subset'
 
 alt.renderers.enable('notebook')
 
-def prepGDFs(buildings_in, buildings_out, rivers):
+def prepGDFs(*gdfs):
     """Prepare GeoDataFrames for use by Altair's alt.Data() class.
 
     This step is separated from actual rendering to not affect performance measurement. 
     """
 
-    def toLatLon(*gdfs):
-        """Convert GDFs to geographic coordinates as expected by Altair
-        """
-        li = []
-        for gdf in gdfs:
-            gdf = gdf.to_crs(epsg=4326)
-            li.append(gdf)
-
-        return li
-
-    buildings_in, buildings_out, rivers = toLatLon(buildings_in, buildings_out, rivers)
+    buildings_in, buildings_out, rivers = [gdf.to_crs(epsg=4326) for gdf in gdfs]
     
     buildings_in['Legend'] = 'Building within 500m of river/stream'
     buildings_out['Legend'] = 'Building outside 500m of river/stream'
     rivers['Legend'] = 'River/stream'
 
-    merged = buildings_in.append(buildings_out)
-    merged = merged.append(rivers)
+    merged = buildings_in.append(buildings_out).append(rivers)
 
     merged_json = merged.to_json()
 
@@ -94,14 +83,9 @@ def renderFigure(json_features, viz_type=viz_type, db_name=db_name, basemap=base
         height=400
     ).encode(
         color=alt.Color("properties.Legend:N", scale=alt.Scale(domain=domain, range=range_), legend=alt.Legend(title='Legend', orient='top-right'))
-    ).interactive()
+    )
 
-    chart # does not render chart in VSCode-Python
-
-    # uncomment if running in VSCode on Windows to open chart in browser
-    # this will block the VSCode Interpreter until the browser tab is closed
-
-    # chart.show()
+    altair_viewer.display(chart)
 
     if savefig:
         if not os.path.exists(outputdir + viz_type):

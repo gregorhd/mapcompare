@@ -111,8 +111,11 @@ Short-listed libraries are then compared as follows:
 
 ![Overview of outputs - static](sample_outputs_static.png)
 
-  
+![Comparison of outputs - static](meta_outputs_static.png)
+
 ### Interactive visualisations
   
 
 ![Overview of outputs - interactive](sample_outputs_interactive.png)
+
+![Comparison of outputs - interactive](meta_outputs_interactive.png)

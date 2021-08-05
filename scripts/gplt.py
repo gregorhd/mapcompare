@@ -23,50 +23,38 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd' 
+db_name = 'dd_subset' 
 basemap = True
 savefig = True
 
 
-def toLatLon(*gdfs):
-    """Convert GDFs to geographic coordinates as expected by geoplot
-    """
-    li = []
-    for gdf in gdfs:
-        gdf = gdf.to_crs(epsg=4326)
-        li.append(gdf)
+def prepGDFs(*gdfs):
+    """Convert GDFs to geographic coordinates as expected by geoplot and calculates the combined bounding box (extent) of all GDFs.
 
-    return li
+    This step is separated from actual rendering to not affect performance measurement.
+    """
+    gdfs = [gdf.to_crs(epsg=4326) for gdf in gdfs]
+
+    list_of_bounds = [gdf.total_bounds for gdf in gdfs]
+                
+    xmin = np.min([item[0] for item in list_of_bounds])
+    xmax = np.max([item[2] for item in list_of_bounds])
+    ymin = np.min([item[1] for item in list_of_bounds])
+    ymax = np.max([item[3] for item in list_of_bounds])
+        
+    # geoplot order different from cartopy order
+    extent = [xmin, ymin, xmax, ymax]
+
+    return (gdfs, extent)
 
 
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
     
-    def getBBox(*gdfs):
-        """Return combined bbox of all GDFs in format x0, y0, x1, y1.
-        """
-
-        list_of_bounds = []
-        for gdf in gdfs:
-            gdf_bounds = gdf.total_bounds
-            list_of_bounds.append(gdf_bounds)
-            
-        xmin = np.min([item[0] for item in list_of_bounds])
-        xmax = np.max([item[2] for item in list_of_bounds])
-        ymin = np.min([item[1] for item in list_of_bounds])
-        ymax = np.max([item[3] for item in list_of_bounds])
-        
-        # geoplot order different from cartopy order
-        extent = [xmin, ymin, xmax, ymax]
-        
-        return extent
-
      # Get number of features per GDF, to display in legend
     buildings_in_no = str(len(buildings_in.index))
     buildings_out_no = str(len(buildings_out.index))
     rivers_no = str(len(rivers.index))
-
-    extent = getBBox(buildings_in, buildings_out, rivers)
 
     if basemap:
         ax = gplt.webmap(buildings_in, extent=extent, projection=gcrs.WebMercator(), figsize=(20, 10))
@@ -101,6 +89,6 @@ if __name__ == "__main__":
 
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
 
-    buildings_in, buildings_out, rivers = toLatLon(buildings_in, buildings_out, rivers)
+    ((buildings_in, buildings_out, rivers), extent) = prepGDFs(buildings_in, buildings_out, rivers)
     
     renderFigure(buildings_in, buildings_out, rivers)

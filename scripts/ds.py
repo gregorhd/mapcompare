@@ -51,8 +51,7 @@ def prepGDFs(buildings_in, buildings_out, rivers):
     
 
     # Merge GDFs and set category column 
-    merged = buildings_in.append(buildings_out)
-    merged = merged.append(rivers)
+    merged = buildings_in.append(buildings_out).append(rivers)
     merged['category'] = merged['category'].astype('category')
     
     spatialpdGDF = GeoDataFrame(merged)

@@ -19,25 +19,15 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd' 
-basemap = False
+db_name = 'dd_subset' 
+basemap = True
 savefig = False
 
-def prepGDFs(buildings_in, buildings_out, rivers):
+def prepGDFs(*gdfs):
     """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() methods.
 
     This step is separated from actual rendering to not affect performance measurement. 
     """
-
-    def toLatLon(*gdfs):
-        """Convert GDFs to geographic coordinates as expected by plotly
-        """
-        li = []
-        for gdf in gdfs:
-            gdf = gdf.to_crs(epsg=4326)
-            li.append(gdf)
-
-        return li
 
     def get_zoom_mercator(minlon, maxlon, minlat, maxlat, width_to_height):
         """Return optimal zoom level for mapbox maps in Mercator projection.
@@ -63,9 +53,9 @@ def prepGDFs(buildings_in, buildings_out, rivers):
 
         return round(min(lon_zoom, lat_zoom))
 
-    buildings_in, buildings_out, rivers = toLatLon(buildings_in, buildings_out, rivers)
+    buildings_in, buildings_out, rivers = [gdf.to_crs(epsg=4326) for gdf in gdfs]
     
-    # Plotly does not allow for adding multiple GDFs to the same figure successively (?)
+    # Plotly does not seem to allow for adding multiple GDFs to the same figure successively (?)
     # Therefore, create Legend column in each GDF prior to GDF merge
     # This will serve as the discrete value against which to apply the symbology
     buildings_in['Legend'] = 'Building within 500m of river/stream'
@@ -73,8 +63,7 @@ def prepGDFs(buildings_in, buildings_out, rivers):
     rivers['Legend'] = 'River/stream'
 
     # Merge GDFs and rename column headers for hover-over tooltips
-    merged = buildings_in.append(buildings_out)
-    merged = merged.append(rivers)
+    merged = buildings_in.append(buildings_out).append(rivers)
     merged.rename(columns={"use": "Building use"}, inplace=True)
 
     # reset index, which plotly uses to select features to draw
