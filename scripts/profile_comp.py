@@ -16,7 +16,7 @@ from mapcompare.cProfile_viz import num_times
 
 # INPUTS
 viz_type = 'static/'
-db_name = 'dd'
+db_name = 'dd_subset'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
 
@@ -96,13 +96,18 @@ if __name__ == "__main__":
 
     # Plot cumtimes to bar chart
 
-    df1.plot.bar(x=x_label, y="mean", yerr=list(df1['std']), ecolor='grey', capsize=5, alpha=0.5, ylabel="seconds", rot='horizontal', title="cProfile: mean cumulative CPU time ("+ str(num_times) + ' runs)', legend=False)
+    ax = df1.plot.bar(x=x_label, y="mean", yerr=list(df1['std']), ecolor='grey', capsize=5, alpha=0.5, ylabel="seconds", rot='horizontal', title="cProfile: mean cumulative CPU time ("+ str(num_times) + ' runs)', legend=False)
 
     for i in range(len(df1['mean'])):
         plt.annotate("{:.2f}".format(df1['mean'][i]) + 's', xy=(df.index[i], df1['mean'][i]), ha='center', va='bottom')
 
     plt.subplots_adjust(bottom=0.25)
 
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
     plt.savefig(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' comparison', facecolor='white')
+
+    plt.savefig('comp_profile_' + viz_type[:-1] + '_' + db_name, facecolor='white')
 
     # snakeviz('gv', 'interactive/', 'dd')

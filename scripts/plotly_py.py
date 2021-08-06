@@ -73,7 +73,12 @@ def prepGDFs(*gdfs):
     merged.reset_index(inplace=True)    
     merged['id'] = merged.index
 
-    merged.to_file("mapcompare\\temp\\" + viz_type + "plotly_py (" + db_name + ").json", driver='GeoJSON')
+    tempdir = "mapcompare/temp/" + viz_type
+
+    if not os.path.exists(tempdir):
+        os.makedirs(tempdir)
+
+    merged.to_file(tempdir + "plotly_py (" + db_name + ").json", driver='GeoJSON')
 
     # Determine opimtal view vars for Mapbox base map, which is currently not automated
     extent = merged.total_bounds
@@ -81,7 +86,7 @@ def prepGDFs(*gdfs):
     aspect_ratio = (extent[2] - extent [0]) / (extent[3] - extent[1])
     zoom = get_zoom_mercator(extent[0], extent[2], extent[1], extent[3], aspect_ratio)
 
-    return merged, zoom, centerx, centery
+    return merged, zoom, centerx, centery, tempdir
 
 @to_cProfile
 def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
@@ -96,7 +101,7 @@ def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefi
         # Plot with tile map using px.choropleth_mapbox()
         # This seems to always require a .json temp file
 
-        with open("mapcompare\\temp\\" + viz_type + "plotly_py (" + db_name + ").json") as f:
+        with open(tempdir + "plotly_py (" + db_name + ").json") as f:
             geojson = json.load(f)
 
         fig = px.choropleth_mapbox(merged, geojson=geojson, locations=merged['id'], title=title, color=merged['Legend'], color_discrete_map={
@@ -134,6 +139,6 @@ if __name__ == "__main__":
     
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
 
-    merged, zoom, centerx, centery = prepGDFs(buildings_in, buildings_out, rivers)
+    merged, zoom, centerx, centery, tempdir = prepGDFs(buildings_in, buildings_out, rivers)
 
     renderFigure(merged, zoom, centerx, centery)

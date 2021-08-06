@@ -6,9 +6,9 @@ Creates a cProfile of the renderFigure() function encompassing the core plotting
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 
-Running this script as is, will produce a static rasterisation of the polygons, which will not be updated when zooming in.
+Running this script as is, will produce a static rasterisation of the polygons not updated when zooming in.
 
-To have datashader re-calculate the rasterized polygons with every zoom and pan, 
+To have datashader re-calculate the rasterized polygons dynamically with every zoom and pan, 
 cd to apps/hv_ds/ via the command line and enter 'bokeh serve --show main.py'.
 """
 
@@ -32,7 +32,7 @@ viz_type = 'interactive/' # not adjustable
 
 # INPUTS
 db_name = 'dd_subset'
-basemap = True 
+basemap = False 
 savefig = False
 
 def prepGDFs(*gdfs):
