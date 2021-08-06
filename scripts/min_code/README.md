@@ -1,0 +1,1 @@
+The scripts in this folder are "reduced" code versions of the main scripts. They are used to compare code complexity as measured by the number of lines of code.
