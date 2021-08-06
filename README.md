@@ -68,7 +68,7 @@ Short-listed libraries are then compared as follows:
 
   
 
-3. Comparing the complexity of the syntax to reproduce the map template;
+3. Comparing the complexity of the syntax to reproduce the map template (**measure**: number of lines of code);
 
   
 
@@ -86,19 +86,29 @@ Short-listed libraries are then compared as follows:
 
 ## Initial Results
 
-### Subset dataset (feature count: 2,645)
+### Code complexity
+
+Excluding blank lines and comments, and assessing the 'reduced code' versions in `scripts/min_code/` which reproduce the map template including a categorical legend and a tiled basemap, where possible.
+
+|  **Static**  | **Interactive**  |
+|--|--|
+| ![code comparison - static](comp_code_static.png) |  ![code comparison - interactive](comp_code_interactive.png)  |
+
+### CPU runtime
+
+#### Subset dataset (feature count: 2,645)
   
 |  **Static**  | **Interactive**  |
 |--|--|
-| ![cProfile comparison - static](comp_static_subset.png) |  ![cProfile comparison - interactive](comp_interactive_subset.png)  |
+| ![cProfile comparison - static](comp_profile_static_dd_subset.png) |  ![cProfile comparison - interactive](comp_profile_interactive_dd_subset.png)  |
 
 
-###  Complete dataset (feature count: 144,727)
+####  Complete dataset (feature count: 144,727)
 
  
 | **Static** | **Interactive** |
 |--|--|
-| ![cProfile comparison - static](comp_static_full.png)  |  ![cProfile comparison - interactive](comp_interactive_full.png) |
+| ![cProfile comparison - static](comp_profile_static_dd.png)  |  ![cProfile comparison - interactive](comp_profile_interactive_dd.png) |
   
 
 ## Overview of initial outputs (complete dataset)
