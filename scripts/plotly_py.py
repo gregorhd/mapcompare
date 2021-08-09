@@ -5,6 +5,11 @@
 Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
+
+IMPORTANT: If performance benchmarking using the complete dataset,
+this script needs to be executed repeatedly by the user. Otherwise,
+the interpreter crashes after run 1. A message is printed, once the maximum
+number of profiles is present in the profiles folder. 
 """
 
 import os
@@ -19,8 +24,8 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd_subset' 
-basemap = True
+db_name = 'dd' 
+basemap = False
 savefig = False
 
 def prepGDFs(*gdfs):
@@ -93,7 +98,6 @@ def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefi
     """Renders polygons using ploty.py's express.choropleth() method, if not adding a basemap, or its express.choropleth_mapbox() method otherwise.
     """
     
-
     title = 'Click on a legend entry to hide/unhide features'
 
     if basemap:

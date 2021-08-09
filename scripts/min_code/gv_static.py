@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Reduced code sample to plot figure using GeoViews' Polygons class and utilizing the matplotlib backend.
+"""Reduced code sample to plot figure using GeoViews' Polygons class and utilizing either the Bokeh or matplotlib backend.
 """
 
 import numpy as np
@@ -88,3 +88,5 @@ if __name__ == "__main__":
     )
     
     gv.output(layout, size=500, fig='svg')
+
+

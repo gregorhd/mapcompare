@@ -5,7 +5,7 @@
 
 import numpy as np
 from bokeh.models.ranges import Range1d
-from bokeh.io import output_file, show
+from bokeh.io import show
 from bokeh.models import GeoJSONDataSource, Range1d
 from bokeh.plotting import figure
 from mapcompare.sql2gdf import sql2gdf
