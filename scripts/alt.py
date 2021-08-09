@@ -30,7 +30,7 @@ basemap = False
 # chart.save() seems to have a number of issues on Windows
 # see https://github.com/altair-viz/altair_saver/issues/72 and 
 # https://github.com/altair-viz/altair_saver/issues/95 - no luck yet with these solutions
-savefig = True
+savefig = False
 
 
 # mark_geoshape currently does not support interactive mode
@@ -42,9 +42,10 @@ viz_type = 'static/'
 db_name = 'dd_subset'
 
 
-# allgedly works in vscode with this renderer, though no luck yet
+# VCode can allegeld natively display the charts in the interpreter
+# by defining alt.renderers.enable('mimetype') 
+# As of VSCode v1.59 this did not work
 # https://altair-viz.github.io/user_guide/display_frontends.html#displaying-in-vscode
-# alt.renderers.enable('mimetype')
 
 alt.renderers.enable('notebook')
 
@@ -68,7 +69,7 @@ def prepGDFs(*gdfs):
 
     return json_features
 
-
+@to_cProfile
 def renderFigure(json_features, viz_type=viz_type, db_name=db_name, basemap=basemap):
 
     features = alt.Data(values=json_features['features'])
@@ -86,7 +87,7 @@ def renderFigure(json_features, viz_type=viz_type, db_name=db_name, basemap=base
     )
 
     altair_viewer.display(chart)
-
+    
     if savefig:
         if not os.path.exists(outputdir + viz_type):
             os.makedirs(outputdir + viz_type)

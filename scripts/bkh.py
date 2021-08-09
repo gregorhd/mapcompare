@@ -47,7 +47,7 @@ def prepGDFs(*gdfs):
 
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
-    """Renders polygons using Bokeh's plotting.figure.patches() method.
+    """Renders polygons using Bokeh's plotting.figure.patches() function.
     """
     
     if basemap:

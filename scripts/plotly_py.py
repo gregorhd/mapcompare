@@ -7,9 +7,10 @@ The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 
 IMPORTANT: If performance benchmarking using the complete dataset,
-this script needs to be executed repeatedly by the user. Otherwise,
-the interpreter crashes after run 1. A message is printed, once the maximum
-number of profiles is present in the profiles folder. 
+this script needs to be executed repeatedly by the user, preferably using "ipython -i plotly_py.py" rather than VSCode-Python's interpreter. Otherwise,
+the interpreter fails to complete or crashes after run 1. 
+A message indicates the number of runs left or if the required
+number of profiles is present in the profiles folder.
 """
 
 import os
@@ -24,12 +25,12 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd' 
+db_name = 'dd'
 basemap = False
 savefig = False
 
 def prepGDFs(*gdfs):
-    """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() methods.
+    """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() functions.
 
     This step is separated from actual rendering to not affect performance measurement. 
     """

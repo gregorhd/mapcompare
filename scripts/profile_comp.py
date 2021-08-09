@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from mapcompare.cProfile_viz import num_times
 
 # INPUTS
-viz_type = 'static/'
+viz_type = 'interactive/'
 db_name = 'dd_subset'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime']
 
     if viz_type == 'interactive/':
-        rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'hv_ds': 'HoloViews+\ndatashader+\nBokeh'}
+        rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'hv_ds': 'HoloViews+\ndatashader+\nBokeh Server'}
     
     else:
         rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib'}

@@ -7,7 +7,7 @@ The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
-# TODO Optimise performance (the slowest library thus far).
+# TODO Optimise performance, if possible.
 # TODO Add legend for static viz_type
 
 import os
@@ -24,10 +24,10 @@ gv.extension('bokeh', 'matplotlib')
 outputdir = "mapcompare/outputs/"
 
 # INPUTS
-viz_type = 'interactive/'
+viz_type = 'static/'
 db_name = 'dd_subset'
 basemap = True    
-savefig = True
+savefig = False
 
 def prepGDFs(*gdfs):
     """Transforms gdfs to EPSG:4326 and renames the 'geom' column to 'geometry'. The latter is required pending a bug fix by GeoViews.
@@ -163,15 +163,14 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         
     elif basemap and viz_type == 'static/':
         
-        layout = tiles * gv.Polygons(buildings_in, group="buildings_in") * gv.Polygons(buildings_out, group="buildings_out") * gv.Polygons(rivers, group="rivers") 
+        layout = tiles * gv.Polygons(buildings_in, group="buildings_in") * gv.Polygons(buildings_out, group="buildings_out") * gv.Polygons(rivers, group="rivers").opts(projection=ccrs.Mercator())
 
         layout.opts(
             opts.Polygons('buildings_in', cmap=['red'], edgecolor='black', linewidth=0.5, backend="matplotlib"),
             opts.Polygons('buildings_out', cmap=['lightgrey'], edgecolor='black', linewidth=0.5, backend="matplotlib"),
             opts.Polygons('rivers', backend="matplotlib"),
             opts.Overlay(backend='matplotlib'),
-            opts.WMTS(zoom=zoom, backend='matplotlib',
-            projection=ccrs.Mercator())
+            opts.WMTS(zoom=zoom, backend='matplotlib')
         )
         
         gv.output(layout, size=500, fig='svg', backend='matplotlib')
