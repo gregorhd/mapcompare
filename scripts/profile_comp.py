@@ -16,7 +16,7 @@ from mapcompare.cProfile_viz import num_times
 
 # INPUTS
 viz_type = 'interactive/'
-db_name = 'dd_subset'
+db_name = 'dd'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
 

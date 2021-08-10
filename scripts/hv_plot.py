@@ -18,8 +18,8 @@ viz_type = 'interactive/'
 
 # INPUTS
 db_name = 'dd'
-basemap = True
-savefig = True
+basemap = False
+savefig = False
 
 def prepGDFs(*gdfs):
     """Transforms gdfs to EPSG:4326 and renames the 'geom' column to 'geometry'. The latter is required pending a fix by GeoViews/HoloViews (see GeoViews issue #506).
