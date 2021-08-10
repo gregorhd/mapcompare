@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-"""Reduce code sample plotting figure using HoloViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
+"""Reduced code sample plotting figure using GeoViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
 
 Running this script as is, will produce a static rasterisation of the polygons, which will not be updated when zooming in.
 
 To have datashader re-calculate the rasterized polygons with every zoom and pan, 
-cd to apps/hv_ds/ via the command line and enter 'bokeh serve --show main.py'.
+cd to apps/gv_ds/ via the command line and enter 'bokeh serve --show main.py'.
 """
 
-import holoviews as hv
+import holoviews as gv
 from spatialpandas import GeoDataFrame
 import datashader as ds
 from bokeh.plotting import show
@@ -18,7 +18,7 @@ from holoviews.operation.datashader import (
     datashade, inspect_polygons
 )
 
-hv.extension('bokeh')
+gv.extension('bokeh')
 
 # INPUTS
 db_name = 'dd_subset'
@@ -53,21 +53,21 @@ if __name__ == "__main__":
 
     color_key = {'Label1': 'red', 'Label2': 'grey', 'Label3': 'lightblue'}
 
-    legend    = hv.NdOverlay({k: hv.Points([0,0], label=str(k)).opts(
+    legend    = gv.NdOverlay({k: gv.Points([0,0], label=str(k)).opts(
                                             color=v, apply_ranges=False) 
                             for k, v in color_key.items()}, 'category')
 
-    polys = hv.Polygons(spatialpdGDF, vdims='category')
+    polys = gv.Polygons(spatialpdGDF, vdims='category')
 
     shaded = datashade(polys, color_key=color_key, aggregator=ds.by('category', ds.any()))
     hover = inspect_polygons(shaded).opts(fill_color='purple', tools=['hover'])
 
-    tiles = hv.element.tiles.OSM().opts(
+    tiles = gv.tile_sources.OSM().opts(
     min_height=500, responsive=True, xaxis=None, yaxis=None)
 
     layout = tiles * shaded * hover * legend
 
-    p = hv.render(layout)
+    p = gv.render(layout)
 
     show(p)
 

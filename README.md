@@ -7,7 +7,7 @@ Comparison of Python libraries for creating both static and interactive visualis
 
   
 
-An MSc thesis at Ulster University.
+An MSc thesis at Ulster University (on-going).
 
   
 
@@ -23,12 +23,12 @@ The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v
 
   
 
-Provisionally short-listed libraries are indicated in **bold** below.
+The table below summarises the long-list and indicates short-listed libraries in **bold**.
 
   
 | **Static** | **Interactive** |
 |--|--|
-| (1) ***GeoPandas***, (2) ***cartopy***, (3) ***geoplot***, (4) ***datashader*** only, (5) ***GeoViews*** only, (6)* **GeoViews + datashader***, (7) ***Altair***. | (1) ***Bokeh***, (2) ***Plotly.py***, (3) ***Holoviews+datashader+Bokeh***, (4) ***Geoviews+Bokeh***, (5) ***Altair***, (6) *folium*, (7) *mplleaflet*, (8) *geoplotlib*. |
+| (1) ***GeoPandas***, (2) ***cartopy***, (3) ***geoplot***, (4) ***datashader*** (for illustration only), (5) *GeoViews* + *mpl* (apparently no legend support yet), (6) ***Altair*** (no basemap support yet). | (1) ***Bokeh***, (2) ***Plotly.py***, (3) ***GeoViews+Bokeh***, (4) ***GeoViews+datashader+Bokeh***, (5) ***hvPlot+Bokeh***, (6) *Altair* (no *Vega-Lite* support for interactivity with geoshapes yet), (7) *folium*, (8) *mplleaflet*, (9) *geoplotlib*. |
 
 
 
@@ -40,49 +40,37 @@ A simple visualisation task is performed across both the static and interactive 
 
   
 
-Short-listed libraries are then compared as follows:
+Long-listed libraries are first compared by compiling a range of metadata:
+
+  * General implementation strategy (e.g. a high-level interface to a third-party ‘core’ plotting library or a core library itself);
+
+  * Installation channels and requirements;
 
   
 
-1. Comparing a range of library metadata including:
+  * Input formats/required conversions;
 
-  
+  * Output formats (static images, interactive maps. or both);;
 
-* Ease of installation (install via the _pip_ package installer, the _conda_ main channel or the _conda-forge_ community channel, or via _setup.py_);
+  * Proxies measuring the vibrancy of the developer and user community  (_measures_: number of GitHub releases since first release, number of total commits; number of contributors; date of last commit; number of dependent packages and number of dependent repositories.
 
-  
+The short-list then tried to include both large-community, comparatively well-funded projects (such as *Bokeh* and *Plotly*) as well as libraries relying on a more limited number of contributors (such as *geoplot*). It was also attempted to cover a variety of backends and both imperative as well as declarative approaches. 
 
-* Input formats/required conversions;
+The short-listed libraries were then compared along these indicators:
 
-  
+1.	the quality of documentation based on a element-wise juxtaposition of documentation ‘elements’ and a sample of applicable code examples consulted to implement the common visualisation task;
 
-* Output formats;
+2.	the complexity of the syntax as measured by the total number of lines of code of a ‘reduced code’ version required to reproduce the map template, excluding comments and blank lines;
 
-  
+3.	the ability to reproduce the map template including map elements such as a legend and basemap;
 
-* Continuity of the developer community (_measures_: number of GitHub releases since first release, number of total commits; number of contributors; date of last commit; number of dependent packages and number of dependent repositories.
+4.	resource requirements (output file size and, for interactive visualisations, a subjective assessment of ‘responsiveness’ on pan and zoom);
 
-  
+5.	the time taken for the rendering portion of a script to complete, indicated as an average across a total of N runs: The rendering portion excludes data acquisition and, if required by any library, data pre-processing and conversion. CPU times were measured using the *cProfile* module after a kernel restart to prevent caching from prior runs skewing the measurement. During performance measurement, no basemap tiles were added to also not skew results due to tile fetching.
 
-2. Reproducing a pre-defined map template as closely as possible;
+6.	Any other limitations or challenges encountered.
 
-  
 
-3. Comparing the complexity of the syntax to reproduce the map template (**measure**: number of lines of code);
-
-  
-
-4. Comparing the time taken for only the rendering portion of a script to complete, i.e. excluding the data acquisition and, if required by any library, the data preparation portion, using *cProfile* .
-
-  
-
-7. Comparing the visual quality and functionality of the map products (conformity with the map template, responsiveness, interactive enhancements);
-
-  
-
-8. Any limitations and technical challenges encountered.
-
-  
 
 ## Initial Results
 

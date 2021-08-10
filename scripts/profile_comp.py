@@ -76,7 +76,7 @@ if __name__ == "__main__":
     df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime']
 
     if viz_type == 'interactive/':
-        rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'hv_ds': 'HoloViews+\ndatashader+\nBokeh Server'}
+        rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nHoloViews+\nBokeh'}
     
     else:
         rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib'}

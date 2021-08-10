@@ -20,14 +20,14 @@ if not '\\'.join(__file__.split('\\')[:-1]) == os.getcwd():
                 line_dict[fn] = sum(1 for line in f if line.strip() and not line.startswith('#') and not line.startswith('"""'))
     os.chdir('../../')
 else:
-    print("os.chdir() to repo root directory and rerun this script")
+    print("os.chdir() to repo root directory and rerun script")
 
 df = pd.DataFrame(line_dict.items(), columns=['library','code_num'])
 
 df['library'] = [lib_name.split('_' + viz_type)[0] for lib_name in df['library']]
 
 if viz_type == 'interactive':
-    rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy', 'gpd': 'GeoPandas', 'gplt': 'geoplot', 'bkh': 'Bokeh', 'plotly_py': 'Plotly.py*', 'gv': 'GeoViews+\nBokeh', 'hv_ds': 'HoloViews+\ndatashader+\nBokeh'}
+    rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nHoloViews+\nBokeh'}
 
 else:
     rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib*'}

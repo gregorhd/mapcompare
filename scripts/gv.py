@@ -7,9 +7,6 @@ The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
 
-# TODO Optimise performance, if possible.
-# TODO Add legend for static viz_type
-
 import os
 import numpy as np
 import geoviews as gv
@@ -23,18 +20,22 @@ from cartopy import crs as ccrs
 gv.extension('bokeh', 'matplotlib')
 outputdir = "mapcompare/outputs/"
 
+# static interface to mpl not included in short-list but generally works, except for the legend and some quirky symbology when saving to .svg
+# see: https://stackoverflow.com/questions/68318769/geoviews-applying-matplotlib-styling-parameters-to-polygons-elements 
+# also: https://stackoverflow.com/questions/68559470/geoviews-categorical-legend-for-geodataframes-with-matplotlib-backend
+viz_type = 'interactive/'
+
 # INPUTS
-viz_type = 'static/'
-db_name = 'dd_subset'
-basemap = True    
+db_name = 'dd'
+basemap = False    
 savefig = False
 
 def prepGDFs(*gdfs):
-    """Transforms gdfs to EPSG:4326 and renames the 'geom' column to 'geometry'. The latter is required pending a bug fix by GeoViews.
+    """Transforms gdfs to EPSG:3857 (for Bokeh) or EPSG:4326 (for mpl) and renames the 'geom' column to 'geometry'. The latter is required pending a bug fix by GeoViews (see GeoViews issue #506).
 
     Also calculates an appropriate zoom level if a tiled basemap is added while using the Matplotlib backend.
 
-    These steps are separated from actual rendering to not affect performance measurement. 
+    These steps are separated from actual rendering to not affect performance measurement.
     """
     def getBBox(*gdfs):
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
@@ -74,7 +75,12 @@ def prepGDFs(*gdfs):
 
         return round(min(lon_zoom, lat_zoom))
 
-    gdfs = [gdf.to_crs(epsg=4326).rename(columns={'geom': 'geometry'}) for gdf in gdfs]
+    # pre-projecting to Web Mercator as this is what GeoViews would be doing prior to rendering via Bokeh 
+    if viz_type == 'interactive/':
+        gdfs = [gdf.to_crs(epsg=3857).rename(columns={'geom': 'geometry'}) for gdf in gdfs]
+
+    elif viz_type == 'static/':
+        gdfs = [gdf.to_crs(epsg=4326).rename(columns={'geom': 'geometry'}) for gdf in gdfs]
 
     extent = getBBox(*gdfs)
 
@@ -122,9 +128,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     
     elif basemap == False and viz_type == 'interactive/':
 
-        buildings_in = gv.Polygons(buildings_in).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
-        buildings_out = gv.Polygons(buildings_out).opts(tools=['hover'], color_index=None, color='lightgrey')
-        rivers = gv.Polygons(rivers).opts(color='lightblue')
+        buildings_in = gv.Polygons(buildings_in, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
+        buildings_out = gv.Polygons(buildings_out, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='lightgrey')
+        rivers = gv.Polygons(rivers, crs=ccrs.GOOGLE_MERCATOR).opts(color='lightblue')
         
         features = buildings_in * buildings_out * rivers
 

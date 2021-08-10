@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-"""Plot figure using HoloViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
+"""Plot figure using GeoViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
+
+The only difference between this script and HoloViews+datashader+Bokeh Server in hv_ds.py
+is the declaration of a Cartopy CRS object in line 79: polys = gv.Polygons(spatialpdGDF, crs=ccrs.GOOGLE_MERCATOR, vdims='category'), and a slight
+difference in the location of the tiles module in line 86:  tiles = gv.tile_sources.OSM().opts(...)
 
 Creates a cProfile of the renderFigure() function encompassing the core plotting task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
@@ -9,11 +13,11 @@ This is to avoid tile loading affecting performance measurement of the core plot
 Running this script as is, will produce a static rasterisation of the polygons not updated when zooming in.
 
 To have datashader re-calculate the rasterized polygons dynamically with every zoom and pan, 
-cd to apps/hv_ds/ via the command line and enter 'bokeh serve --show main.py'.
+cd to apps/gv_ds/ via the command line and enter 'bokeh serve --show main.py'.
 """
 
 import os
-import holoviews as hv
+import geoviews as gv
 from spatialpandas import GeoDataFrame
 import datashader as ds
 from bokeh.plotting import show
@@ -23,9 +27,10 @@ from mapcompare.misc.pw import password
 from holoviews.operation.datashader import (
     datashade, inspect_polygons
 )
+from cartopy import crs as ccrs
 
 
-hv.extension('bokeh')
+gv.extension('bokeh')
 
 outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # not adjustable
@@ -67,23 +72,23 @@ def renderFigure(spatialpdGDF, db_name=db_name, viz_type=viz_type, basemap=basem
 
     color_key = {'Buildings within 500m of river/stream': 'red', 'Buildings outside 500m of river/stream': 'grey', 'River/stream': 'lightblue'}
 
-    legend    = hv.NdOverlay({k: hv.Points([0,0], label=str(k)).opts(
+    legend    = gv.NdOverlay({k: gv.Points([0,0], label=str(k)).opts(
                                             color=v, apply_ranges=False) 
                             for k, v in color_key.items()}, 'category')
 
-    polys = hv.Polygons(spatialpdGDF, vdims='category')
+    polys = gv.Polygons(spatialpdGDF, crs=ccrs.GOOGLE_MERCATOR, vdims='category')
 
     shaded = datashade(polys, color_key=color_key, aggregator=ds.by('category', ds.any()))
     hover = inspect_polygons(shaded).opts(fill_color='purple', tools=['hover'])
 
     if basemap:
 
-        tiles = hv.element.tiles.OSM().opts(
+        tiles = gv.tile_sources.OSM().opts(
         min_height=500, responsive=True, xaxis=None, yaxis=None)
 
         layout = tiles * shaded * hover * legend
 
-        p = hv.render(layout)
+        p = gv.render(layout)
 
     else:
         
@@ -91,7 +96,7 @@ def renderFigure(spatialpdGDF, db_name=db_name, viz_type=viz_type, basemap=basem
 
         layout.opts(width=700)
 
-        p = hv.render(layout)
+        p = gv.render(layout)
         
         # without basemap, aspect ratio seems to be skewed slightly,
         # hence accessing the Bokeh Figure aspect_ratio attribute directly here
@@ -103,7 +108,7 @@ def renderFigure(spatialpdGDF, db_name=db_name, viz_type=viz_type, basemap=basem
         if not os.path.exists(outputdir + viz_type):
             os.makedirs(outputdir + viz_type)
         
-        hv.save(layout, outputdir + viz_type + "holoviews+datashader+bokeh" + " (" + db_name + ").html")
+        gv.save(layout, outputdir + viz_type + "geoviews+datashader+bokeh" + " (" + db_name + ").html")
     else:
         pass
     

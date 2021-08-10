@@ -1,4 +1,4 @@
-"""Defines the to_cProfile() decorator function to be applied to renderFigure() in the executable for each visualisation libray.
+"""Defines the to_cProfile() decorator function applied to renderFigure() in the executables for each visualisation libray.
 
 cProfiles are only created for decorated functions, if basemap=False to not skew results due to tile fetching.
 """
@@ -33,17 +33,18 @@ def to_cProfile(func, instance, args, kwargs):
     mod_name = os.path.basename(inspect.getmodule(func).__file__)
 
     """The below if and first elif block make performance benchmarking
-    for plotly manual when using  the complete dataset,
+    for Plotly and GeoViews manual when using  the complete dataset,
     and automatic when using the subset. 
-    In  the former case, the user has to repeatedly execute the Plotly script, until the maximum number of runs is reached,  since this would otherwise overwhelm the interpreter after run 1.
+    In  the former case, the user has to repeatedly execute the scripts, until the maximum number of runs is reached,  since this would otherwise either overwhelm the interpreter (plotly),
+    not complete at all or complete after an indeterminate amount of time (GeoViews).
     """
     
-    if mod_name.startswith('plotly') and db_name == 'dd' and basemap_val == 'False':
+    if (mod_name.startswith('plotly') and db_name == 'dd' and basemap_val == 'False') or (mod_name.endswith('gv.py') and db_name == 'dd' and basemap_val == 'False'):
 
         profilepath = profiledir + mod_name[:-3] + ' (' + db_name + ")" + " run " + str(num_times) + ".prof"
 
         if os.path.exists(profilepath):
-            print("Profiling for Plotly completed already. Exiting.")
+            print("Profiling complete already. Exiting.")
 
         else:
 
@@ -69,13 +70,13 @@ def to_cProfile(func, instance, args, kwargs):
                             print("Run {} more time(s).".format(str(num_times - i - 1)))
                         
                         elif i + 1 == num_times:
-                            print("Profiling for Plotly completed.")
+                            print("Profiling complete.")
 
                         return value
 
                     i += 1
 
-    elif mod_name.startswith('plotly') and db_name == 'dd_subset' and str(inspect.signature(func).parameters['basemap'])[-5:] == 'False':
+    elif (mod_name.startswith('plotly') and db_name == 'dd_subset' and basemap_val == 'False') or (mod_name.endswith('gv.py') and db_name == 'dd_subset' and basemap_val == 'False'):
         
         for i in range(num_times):
 
@@ -91,7 +92,7 @@ def to_cProfile(func, instance, args, kwargs):
 
         return value
 
-    elif not mod_name.startswith('plotly') and str(inspect.signature(func).parameters['basemap'])[-5:] == 'False':
+    elif not mod_name.startswith('plotly') or not mod_name.endswith('gv.py')and basemap_val == 'False':
         
         for i in range(num_times):
 
