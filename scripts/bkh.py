@@ -22,8 +22,8 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd_subset'
-basemap = True
+db_name = 'dd'
+basemap = False
 savefig = False
 
 

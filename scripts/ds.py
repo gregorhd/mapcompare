@@ -17,7 +17,7 @@ viz_type = 'static/' # not adjustable
 basemap = False # not adjustable
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 savefig = False
 
 def prepGDFs(buildings_in, buildings_out, rivers):
@@ -29,10 +29,7 @@ def prepGDFs(buildings_in, buildings_out, rivers):
         """Return combined bbox of all GDFs in format (x0, x1, y0, y1).
         """
 
-        list_of_bounds = []
-        for gdf in gdfs:
-            gdf_bounds = gdf.total_bounds
-            list_of_bounds.append(gdf_bounds)
+        list_of_bounds = [gdf.total_bounds for gdf in gdfs]
             
         xmin = np.min([item[0] for item in list_of_bounds])
         xmax = np.max([item[2] for item in list_of_bounds])

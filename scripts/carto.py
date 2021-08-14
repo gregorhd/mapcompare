@@ -22,8 +22,8 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd_subset' 
-basemap = True
+db_name = 'dd' 
+basemap = False
 savefig = False
 
 def getExtent(*gdfs):
@@ -46,11 +46,6 @@ def getExtent(*gdfs):
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
     
-    # Get number of features per GDF, to display in legend
-    buildings_in_no = str(len(buildings_in.index))
-    buildings_out_no = str(len(buildings_out.index))
-    rivers_no = str(len(rivers.index))
-
     crs = ccrs.UTM(33)
 
     fig, ax = plt.subplots(1, 1, subplot_kw={'projection': crs}, figsize=(20, 10))
@@ -80,7 +75,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     rivers_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='lightblue',edgecolor='blue', linewidth=0.25)]
 
     handles = buildings_in_handle + buildings_out_handle + rivers_handle 
-    labels = ['Buildings within 500m (n=' + buildings_in_no + ')', 'Buildings outside 500m (n=' + buildings_out_no + ')', 'Rivers or streams (n=' + rivers_no + ')']
+    labels = ['Buildings within 500m of river/stream', 'Buildings outside 500m of river/stream', 'Rivers or streams']
 
     leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 

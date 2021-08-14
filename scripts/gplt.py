@@ -23,9 +23,9 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd_subset' 
-basemap = True
-savefig = True
+db_name = 'dd' 
+basemap = False
+savefig = False
 
 
 def prepGDFs(*gdfs):

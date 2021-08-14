@@ -12,10 +12,11 @@ import glob
 import subprocess
 from datetime import datetime
 import matplotlib.pyplot as plt
+import docx
 from mapcompare.cProfile_viz import num_times
 
 # INPUTS
-viz_type = 'interactive/'
+viz_type = 'static/'
 db_name = 'dd'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
@@ -33,7 +34,7 @@ def snakeviz(module, viz_type, db_name):
         'dd' or 'dd_subset'    
     Returns
     ----------
-    Opens snakeviz icicle graph in browser
+    Snakeviz icicle graph in browser
     
     """
     profilepath = 'mapcompare/profiles/' + viz_type + db_name + "/" + module + ' (' + db_name + ')' + " run 1.prof"
@@ -71,9 +72,9 @@ if __name__ == "__main__":
 
     df = pd.concat(li, axis=0, ignore_index=True)
 
-    df1 = df.groupby('library', as_index=False)['cumtime'].mean().rename(columns={'cumtime': 'mean'})
+    df1 = df.groupby('library', as_index=False)['cumtime'].mean().rename(columns={'cumtime': 'mean'}).round(decimals=3)
 
-    df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime']
+    df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime'].round(decimals=3)
 
     if viz_type == 'interactive/':
         rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nHoloViews+\nBokeh'}
@@ -111,3 +112,22 @@ if __name__ == "__main__":
     plt.savefig('comp_profile_' + viz_type[:-1] + '_' + db_name, facecolor='white')
 
     # snakeviz('gv', 'interactive/', 'dd')
+
+    # open an existing document
+    doc = docx.Document()
+
+    # add a table to the end and create a reference variable
+    # extra row is so we can add the header row
+    t = doc.add_table(df1.shape[0]+1, df1.shape[1])
+
+    # add the header rows.
+    for j in range(df1.shape[-1]):
+        t.cell(0,j).text = df1.columns[j]
+
+    # add the rest of the data frame
+    for i in range(df1.shape[0]):
+        for j in range(df1.shape[-1]):
+            t.cell(i+1,j).text = str(df1.values[i,j])
+
+    # save the doc
+    doc.save(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' dataframe.docx')

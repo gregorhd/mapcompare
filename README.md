@@ -52,7 +52,7 @@ Long-listed libraries are first compared by compiling a range of metadata:
 
   * Output formats (static images, interactive maps. or both);;
 
-  * Proxies measuring the vibrancy of the developer and user community  (_measures_: number of GitHub releases since first release, number of total commits; number of contributors; date of last commit; number of dependent packages and number of dependent repositories.
+  * Proxies measuring the vibrancy of the developer and user community  (_measures_: number of GitHub releases since first release, number of total commits; number of contributors; date of last commit; number of dependent packages and number of dependent repositories).
 
 The short-list then tried to include both large-community, comparatively well-funded projects (such as *Bokeh* and *Plotly*) as well as libraries relying on a more limited number of contributors (such as *geoplot*). It was also attempted to cover a variety of backends and both imperative as well as declarative approaches. 
 
@@ -99,7 +99,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 | ![cProfile comparison - static](comp_profile_static_dd.png)  |  ![cProfile comparison - interactive](comp_profile_interactive_dd.png) |
   
 
-## Overview of initial outputs (complete dataset)
+## Output samples
 
  
 

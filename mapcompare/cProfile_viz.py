@@ -1,4 +1,4 @@
-"""Defines the to_cProfile() decorator function applied to renderFigure() in the executables for each visualisation libray.
+"""Defines the to_cProfile() decorator function applied to renderFigure() in the executables for each visualisation library.
 
 cProfiles are only created for decorated functions, if basemap=False to not skew results due to tile fetching.
 """
@@ -10,7 +10,7 @@ import inspect
 import cProfile
 
 # INPUT
-num_times = 3 # number of runs when benchmarking
+num_times = 10 # number of runs when benchmarking
 
 @wrapt.decorator
 def to_cProfile(func, instance, args, kwargs):
@@ -75,6 +75,8 @@ def to_cProfile(func, instance, args, kwargs):
                         return value
 
                     i += 1
+    
+    # Below elif block causes GeoViews and Plotly cProfiles on the subset to be counted automatically again
 
     elif (mod_name.startswith('plotly') and db_name == 'dd_subset' and basemap_val == 'False') or (mod_name.endswith('gv.py') and db_name == 'dd_subset' and basemap_val == 'False'):
         
@@ -92,7 +94,10 @@ def to_cProfile(func, instance, args, kwargs):
 
         return value
 
-    elif not mod_name.startswith('plotly') or not mod_name.endswith('gv.py')and basemap_val == 'False':
+    # This last elif block covers the 'run benchmark' case for all other
+    # libraries (that are not Plotly or not GeoViews)
+
+    elif (not mod_name.startswith('plotly') and basemap_val == 'False') or (not mod_name.endswith('gv.py') and basemap_val == 'False'):
         
         for i in range(num_times):
 

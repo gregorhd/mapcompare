@@ -1,63 +1,66 @@
 #!/usr/bin/env python
 
-"""Reduced code sample plotting figure using GeoViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
+"""Reduced code version plotting figure using GeoViews, datashader and Bokeh Server in conjunction.
 
-Running this script as is, will produce a static rasterisation of the polygons, which will not be updated when zooming in.
+The only difference between this app and HoloViews+datashader+Bokeh Server
+is the declaration of a Cartopy CRS object in line 65: polys = gv.Polygons(spatialpdGDF, crs=ccrs.GOOGLE_MERCATOR, vdims='category'), and a slight
+difference in the location of the tiles module in line 72:  tiles = gv.tile_sources.OSM().opts(...)
 
-To have datashader re-calculate the rasterized polygons with every zoom and pan, 
-cd to apps/gv_ds/ via the command line and enter 'bokeh serve --show main.py'.
+To run the live app and have datashader re-calculate the rasterized polygons with every zoom and pan, 
+cd to the containing folder via the command line
+and enter 'bokeh serve --show main.py'.
+
 """
-
-import holoviews as gv
+import sys; sys.path.insert(0, '../..')
+import geoviews as gv
 from spatialpandas import GeoDataFrame
 import datashader as ds
-from bokeh.plotting import show
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from holoviews.operation.datashader import (
     datashade, inspect_polygons
 )
+from cartopy import crs as ccrs
+
 
 gv.extension('bokeh')
 
+
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 
 def prepGDFs(*gdfs):
-    """Prepare GeoDataFrames for use by HoloViews' Polygons class.
+    """Prepare GeoDataFrames for use by Holoviews' Polygons class.
     """
 
-    # transform to webmercator to align with basemap, if added
+    # transform to webmercator to align with basemap
+    buildings_in, buildings_out, rivers = [gdf.to_crs(epsg=3857) for gdf in gdfs]
 
-    gdf1, gdf2, gdf3 = [gdf.to_crs(epsg=3857) for gdf in gdfs]
-
-    gdf1['category'] = 'Label1'
-    gdf2['category'] = 'Label2'
-    gdf3['category'] = 'Label3'
+    buildings_in['category'] = 'Buildings within 500m of river/stream'
+    buildings_out['category'] = 'Buildings outside 500m of river/stream'
+    rivers['category'] = 'River/stream'
 
 
     # Merge GDFs and set category column 
-    merged = gdf1.append(gdf2).append(gdf3)
+    merged = buildings_in.append(buildings_out)
+    merged = merged.append(rivers)
     merged['category'] = merged['category'].astype('category')
     
     spatialpdGDF = GeoDataFrame(merged)
     
     return spatialpdGDF
 
-
 if __name__ == "__main__":
 
-    gdf1, gdf2, gdf3 = sql2gdf(db_name, password)
+    buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
 
-    spatialpdGDF = prepGDFs(gdf1, gdf2, gdf3)
+    spatialpdGDF = prepGDFs(buildings_in, buildings_out, rivers)
 
-    color_key = {'Label1': 'red', 'Label2': 'grey', 'Label3': 'lightblue'}
+    color_key = {'Buildings within 500m of river/stream': 'red', 'Buildings outside 500m of river/stream': 'grey', 'River/stream': 'lightblue'}
 
-    legend    = gv.NdOverlay({k: gv.Points([0,0], label=str(k)).opts(
-                                            color=v, apply_ranges=False) 
-                            for k, v in color_key.items()}, 'category')
+    legend = gv.NdOverlay({k: gv.Points([0,0], label=str(k)).opts(color=v, apply_ranges=False) for k, v in color_key.items()}, 'category')
 
-    polys = gv.Polygons(spatialpdGDF, vdims='category')
+    polys = gv.Polygons(spatialpdGDF, crs=ccrs.GOOGLE_MERCATOR, vdims='category')
 
     shaded = datashade(polys, color_key=color_key, aggregator=ds.by('category', ds.any()))
     hover = inspect_polygons(shaded).opts(fill_color='purple', tools=['hover'])
@@ -67,16 +70,6 @@ if __name__ == "__main__":
 
     layout = tiles * shaded * hover * legend
 
-    p = gv.render(layout)
-
-    show(p)
-
-    
-
-
-
-
-
-
-
+    doc = gv.renderer('bokeh').server_doc(layout)
+    doc.title = 'GeoViews + Datashader + Bokeh App'
 

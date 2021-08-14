@@ -39,7 +39,7 @@ viz_type = 'static/'
 
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 
 
 # VCode can allegeld natively display the charts in the interpreter
