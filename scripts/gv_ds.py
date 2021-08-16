@@ -36,8 +36,8 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # not adjustable
 
 # INPUTS
-db_name = 'dd'
-basemap = False 
+db_name = 'dd_subset'
+basemap = True
 savefig = False
 
 def prepGDFs(*gdfs):

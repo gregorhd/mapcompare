@@ -58,11 +58,11 @@ The short-list then tried to include both large-community, comparatively well-fu
 
 The short-listed libraries were then compared along these indicators:
 
-1.	the quality of documentation based on a element-wise juxtaposition of documentation ‘elements’ and a sample of applicable code examples consulted to implement the common visualisation task;
+1.	the range of documentation based on a juxtaposition of documentation ‘elements’ and a sample of applicable code examples consulted to implement the common visualisation task;
 
 2.	the complexity of the syntax as measured by the total number of lines of code of a ‘reduced code’ version required to reproduce the map template, excluding comments and blank lines;
 
-3.	the ability to reproduce the map template including map elements such as a legend and basemap;
+3.	the ability to reproduce the map template including map elements such as a categorical legend and basemap;
 
 4.	resource requirements (output file size and, for interactive visualisations, a subjective assessment of ‘responsiveness’ on pan and zoom);
 
@@ -82,7 +82,9 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 |--|--|
 | ![code comparison - static](comp_code_static.png) |  ![code comparison - interactive](comp_code_interactive.png)  |
 
-### CPU runtime
+### CPU runtime (work in progress)
+
+The below results currently do not yet take into account the different rendering strategies of libraries which affects when the _cProfile_ considers `renderFigure()` to be completed for each. How to do this to establish a equal basis upon which to compare libraries is currently being investigated.
 
 #### Subset dataset (feature count: 2,645)
   

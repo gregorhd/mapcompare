@@ -2,7 +2,7 @@
 
 """Plot figure using hvPlot.
 
-Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
+Creates a cProfile of the renderFigure() function encompassing the core plotting task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
@@ -17,7 +17,7 @@ outputdir = "mapcompare/outputs/"
 viz_type = 'interactive/'
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 basemap = False
 savefig = False
 
@@ -47,8 +47,6 @@ def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_
         plot = (
         merged.hvplot(geo=True, cmap=['red', 'lightgrey', 'lightblue'], tiles='OSM', hover_cols=['Legend', 'Building use'], xaxis=None, yaxis=None, legend='top_right', height=500)
         )
-        
-        hvplot.show(plot)
 
     elif not basemap:
 
@@ -56,7 +54,7 @@ def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_
         merged.hvplot(geo=True, cmap=['red', 'lightgrey', 'lightblue'], hover_cols=['Legend', 'Building use'], xaxis=None, yaxis=None, legend='top_right', height=500)
         )
         
-        hvplot.show(plot)
+    hvplot.show(plot)
 
     if savefig:
         if not os.path.exists(outputdir + viz_type):

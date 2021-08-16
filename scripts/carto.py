@@ -2,11 +2,11 @@
 
 """Plot figure using cartopy's GeoAxes.add_geometries() interface to matplotlib.
 
-Creates a cProfile of the renderFigure() function encompassing the core plottinh task.
+Creates a cProfile of the renderFigure() function encompassing the core plotting task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
-
+import cartopy
 import os
 import numpy as np
 import contextily as ctx
@@ -78,6 +78,8 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     labels = ['Buildings within 500m of river/stream', 'Buildings outside 500m of river/stream', 'Rivers or streams']
 
     leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
+
+    fig.canvas.draw() # added since cartopy's rendering function is executed lazily and would otherwise not be included in the cProfile
 
     if savefig:
         if not os.path.exists(outputdir + viz_type):
