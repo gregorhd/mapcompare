@@ -3,6 +3,7 @@
 cProfiles are only created for decorated functions, if basemap=False to not skew results due to tile fetching.
 """
 
+from subprocess import STARTF_USESHOWWINDOW
 import wrapt
 import os
 import re
@@ -32,14 +33,12 @@ def to_cProfile(func, instance, args, kwargs):
 
     mod_name = os.path.basename(inspect.getmodule(func).__file__)
 
-    """The below if and first elif block make performance benchmarking
-    for Plotly and GeoViews manual when using  the complete dataset,
-    and automatic when using the subset. 
-    In  the former case, the user has to repeatedly execute the scripts, until the maximum number of runs is reached,  since this would otherwise either overwhelm the interpreter (plotly),
-    not complete at all or complete after an indeterminate amount of time (GeoViews).
+    """The below if and elif block make performance benchmarking for successive runs
+    manual except for the 'out of competition' runs of datashader.
+    This is to keep approaches like reuse of already drawn canvases from skewing results.
     """
     
-    if (mod_name.startswith('plotly') and db_name == 'dd' and basemap_val == 'False') or (mod_name.endswith('gv.py') and db_name == 'dd' and basemap_val == 'False'):
+    if basemap_val == 'False' and not mod_name.startswith('ds'):
 
         profilepath = profiledir + mod_name[:-3] + ' (' + db_name + ")" + " run " + str(num_times) + ".prof"
 
@@ -76,28 +75,10 @@ def to_cProfile(func, instance, args, kwargs):
 
                     i += 1
     
-    # Below elif block causes GeoViews and Plotly cProfiles on the subset to be counted automatically again
-
-    elif (mod_name.startswith('plotly') and db_name == 'dd_subset' and basemap_val == 'False') or (mod_name.endswith('gv.py') and db_name == 'dd_subset' and basemap_val == 'False'):
-        
-        for i in range(num_times):
-
-            p = cProfile.Profile()
-            p.enable()
-
-            value = func(*args, **kwargs)
-
-            p.disable()
-            p.dump_stats(profiledir + mod_name[:-3] + ' ' + '(' + db_name + ")" + " run " + str(i + 1) + ".prof")
-            
-            print(f"\ncProfile created in " + profiledir + " for run #{} of {}() in module {}".format(str(i + 1), func.__name__, mod_name))
-
-        return value
-
-    # This last elif block covers the 'run benchmark' case for all other
-    # libraries (that are not Plotly or not GeoViews)
-
-    elif (not mod_name.startswith('plotly') and basemap_val == 'False') or (not mod_name.endswith('gv.py') and basemap_val == 'False'):
+    # execute datashader's renderFigure() in a loop to demonstrate effect of numba
+    # on performance during first and subsequent runs
+    
+    elif mod_name.startswith('ds'):
         
         for i in range(num_times):
 

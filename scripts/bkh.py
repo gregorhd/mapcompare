@@ -45,9 +45,27 @@ def prepGDFs(*gdfs):
 
     return (gdfs, extent, aspect_ratio)
 
+
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
-    """Renders polygons using Bokeh's plotting.figure.patches() function.
+    """Renders the figure reproducing the map template.
+
+    Parameters
+    ----------
+    buildings_in, buildings_out, rivers : GeoDataframes
+        The three feature sets styled and added separately to the figure.
+    basemap : Boolean
+        Global scope variable determining whether or not to add an OSM basemap.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to html in /mapcompare/outputs/[viz_type]
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template.
     """
     
     if basemap:
@@ -96,6 +114,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         pass
 
     show(p)
+
 
 if __name__ == "__main__":
 

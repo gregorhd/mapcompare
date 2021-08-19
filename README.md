@@ -84,7 +84,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 ### CPU runtime (work in progress)
 
-The below results currently do not yet take into account the different rendering strategies of libraries which affects when the _cProfile_ considers `renderFigure()` to be completed for each. How to do this to establish a equal basis upon which to compare libraries is currently being investigated.
+The below results currently do not yet take into account the different rendering strategies of libraries which affects when _cProfile_ considers `renderFigure()` to be completed for each. How to establish an equal basis for comparison is currently being investigated.
 
 #### Subset dataset (feature count: 2,645)
   

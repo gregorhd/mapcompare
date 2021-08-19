@@ -30,6 +30,7 @@ db_name = 'dd'
 basemap = False    
 savefig = False
 
+
 def prepGDFs(*gdfs):
     """Transforms gdfs to EPSG:3857 (for Bokeh) or EPSG:4326 (for mpl) and renames the 'geom' column to 'geometry'. The latter is required pending a bug fix by GeoViews (see GeoViews issue #506).
 

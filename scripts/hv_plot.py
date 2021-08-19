@@ -21,6 +21,7 @@ db_name = 'dd'
 basemap = False
 savefig = False
 
+
 def prepGDFs(*gdfs):
     """Transforms gdfs to EPSG:4326 and renames the 'geom' column to 'geometry'. The latter is required pending a fix by GeoViews/HoloViews (see GeoViews issue #506).
 
@@ -39,8 +40,28 @@ def prepGDFs(*gdfs):
 
     return merged
 
+
 @to_cProfile
 def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+    """Renders the figure reproducing the map template.
+
+    Parameters
+    ----------
+    merged : GeoDataFrame
+        GeoDataFrame containing all three feature sets.
+    basemap : Boolean
+        Global scope variable determining whether or not to add an OSM basemap.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to HTML in /mapcompare/outputs/[viz_type]/.
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template.
+    """
     
     if basemap:
 
@@ -61,6 +82,7 @@ def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_
             os.makedirs(outputdir + viz_type)
 
         hvplot.save(plot, outputdir + viz_type + "hvPlot (" + db_name + ").html")
+
 
 if __name__ == "__main__":
 

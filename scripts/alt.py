@@ -15,11 +15,14 @@ as Altair Saver blocks the interpreter between runs until the browser tab is clo
 """
 
 import os
+import sys
+import importlib
 import altair as alt
 import altair_viewer
 import json
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
+importlib.reload(sys.modules['mapcompare.cProfile_viz']) # no kernel/IDE restart needed after editing cProfile_viz.py
 from mapcompare.cProfile_viz import to_cProfile
 
 outputdir = 'mapcompare/outputs/'
@@ -39,15 +42,16 @@ viz_type = 'static/'
 
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 
 
-# VCode can allegeld natively display the charts in the interpreter
+# VSCode can allegeld natively display the charts in the interpreter
 # by defining alt.renderers.enable('mimetype') 
 # As of VSCode v1.59 this did not work
 # https://altair-viz.github.io/user_guide/display_frontends.html#displaying-in-vscode
 
 alt.renderers.enable('notebook')
+
 
 def prepGDFs(*gdfs):
     """Prepare GeoDataFrames for use by Altair's alt.Data() class.
@@ -69,8 +73,30 @@ def prepGDFs(*gdfs):
 
     return json_features
 
+
 @to_cProfile
-def renderFigure(json_features, viz_type=viz_type, db_name=db_name, basemap=basemap):
+def renderFigure(json_features, basemap=basemap, db_name=db_name, viz_type=viz_type):
+    """Renders the figure reproducing the map template.
+
+    Parameters
+    ----------
+    json_features : dict
+        Python object deserialised from JSON containing all three feature sets.
+    basemap : Boolean
+        Global scope variable determining whether or not to add a basemap.
+        Simply used for triggering the cProfile on inspect.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to SVG. At present, not working on Windows - see
+        https://github.com/altair-viz/altair_saver/issues/97
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template minus the basemap.
+    """
 
     features = alt.Data(values=json_features['features'])
 
@@ -94,6 +120,7 @@ def renderFigure(json_features, viz_type=viz_type, db_name=db_name, basemap=base
         chart.save(outputdir + viz_type + "altair (" + db_name + ").svg", webdriver='firefox')
     else:
         pass
+
 
 if __name__ == "__main__":
 

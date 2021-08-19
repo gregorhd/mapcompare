@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-"""Plot figure using HoloViews, datashader and Bokeh in conjunction. Following this example: https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
+"""Plot figure using HoloViews, datashader and Bokeh in conjunction. Following this example:
+https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
 
 Creates a cProfile of the renderFigure() function encompassing the core plotting task.
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
@@ -35,6 +36,7 @@ db_name = 'dd'
 basemap = False 
 savefig = False
 
+
 def prepGDFs(*gdfs):
     """Prepare GeoDataFrames for use by HoloViews' Polygons class.
 
@@ -62,8 +64,28 @@ def prepGDFs(*gdfs):
     
     return spatialpdGDF, aspect_ratio
 
+
 @to_cProfile
-def renderFigure(spatialpdGDF, db_name=db_name, viz_type=viz_type, basemap=basemap, savefig=savefig):
+def renderFigure(spatialpdGDF, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+    """Renders the figure reproducing the map template.
+
+    Parameters
+    ----------
+    spatialpdGDF : SpatialPandas GeoDataFrame
+        GeoDataFrame containing all three feature sets.
+    basemap : Boolean
+        Global scope variable determining whether or not to add an OSM basemap.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to HTML in /mapcompare/outputs/[viz_type]/.
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template.
+    """
 
     color_key = {'Buildings within 500m of river/stream': 'red', 'Buildings outside 500m of river/stream': 'grey', 'River/stream': 'lightblue'}
 

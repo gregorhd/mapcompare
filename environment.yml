@@ -33,10 +33,10 @@ dependencies:
   - brotlipy=0.7.0=py38h294d835_1001
   - bzip2=1.0.8=h8ffe710_4
   - c-ares=1.17.1=h8ffe710_1
-  - ca-certificates=2021.7.5=haa95532_1
+  - ca-certificates=2021.5.30=h5b45459_0
   - cairo=1.16.0=hb19e0ff_1008
   - cartopy=0.18.0=py38h7c06ecb_13
-  - certifi=2021.5.30=py38haa95532_0
+  - certifi=2021.5.30=py38haa244fe_0
   - cffi=1.14.5=py38hd8c33c5_0
   - cfitsio=3.470=h0af3d06_7
   - cftime=1.5.0=py38hcb5f9af_0
@@ -135,8 +135,10 @@ dependencies:
   - libutf8proc=2.6.1=hcb41399_0
   - libwebp-base=1.2.0=h8ffe710_2
   - libxml2=2.9.12=hf5bbc77_0
+  - libxslt=1.1.33=h65864e5_2
   - llvmlite=0.36.0=py38h57a6900_0
   - locket=0.2.0=py_2
+  - lxml=4.6.3=py38h292cb97_0
   - lz4-c=1.9.3=h8ffe710_0
   - m2w64-gcc-libgfortran=5.3.0=6
   - m2w64-gcc-libs=5.3.0=7
@@ -213,6 +215,7 @@ dependencies:
   - python=3.8.8=h7840368_0_cpython
   - python-chromedriver-binary=92.0.4515.43.0=py38haa244fe_0
   - python-dateutil=2.8.1=py_0
+  - python-docx=0.8.11=pyhd8ed1ab_0
   - python-snappy=0.6.0=py38h8566a25_0
   - python_abi=3.8=1_cp38
   - pytz=2021.1=pyhd8ed1ab_0

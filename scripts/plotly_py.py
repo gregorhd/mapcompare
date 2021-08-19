@@ -29,6 +29,7 @@ db_name = 'dd'
 basemap = False
 savefig = False
 
+
 def prepGDFs(*gdfs):
     """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() functions.
 
@@ -94,9 +95,31 @@ def prepGDFs(*gdfs):
 
     return merged, zoom, centerx, centery, tempdir
 
+
 @to_cProfile
 def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
-    """Renders polygons using ploty.py's express.choropleth() method, if not adding a basemap, or its express.choropleth_mapbox() method otherwise.
+    """Renders the figure reproducing the map template.
+
+    Parameters
+    ----------
+    merged : GeoDataFrame
+        GeoDataFrame containing all three feature sets.
+    zoom : int
+        Optimal zoom level, needed when adding a basemap.
+    centerx, centery : float
+        Coordinates setting the viewport's centre, needed when adding a basemap.
+    basemap : Boolean
+        Global scope variable determining whether or not to add an OSM basemap.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to HTML in /mapcompare/outputs/[viz_type]/.
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template.
     """
     
     title = 'Click on a legend entry to hide/unhide features'
@@ -139,6 +162,7 @@ def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefi
     
     else:
         pass
+    
     
 if __name__ == "__main__":
     

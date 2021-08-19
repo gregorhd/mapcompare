@@ -16,8 +16,8 @@ import docx
 from mapcompare.cProfile_viz import num_times
 
 # INPUTS
-viz_type = 'static/'
-db_name = 'dd'
+viz_type = 'interactive/'
+db_name = 'dd_subset'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
 
@@ -77,10 +77,10 @@ if __name__ == "__main__":
     df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime'].round(decimals=3)
 
     if viz_type == 'interactive/':
-        rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nHoloViews+\nBokeh'}
+        rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nHoloViews+\nBokeh*'}
     
     else:
-        rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib'}
+        rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader*', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib'}
         
 
     df1['library'].replace(rename_dict, inplace=True)
@@ -111,8 +111,6 @@ if __name__ == "__main__":
 
     plt.savefig('comp_profile_' + viz_type[:-1] + '_' + db_name, facecolor='white')
 
-    # snakeviz('gv', 'interactive/', 'dd')
-
     # open an existing document
     doc = docx.Document()
 
@@ -131,3 +129,6 @@ if __name__ == "__main__":
 
     # save the doc
     doc.save(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' dataframe.docx')
+
+    # snakeviz('carto', 'static/', 'dd')
+    

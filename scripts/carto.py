@@ -6,8 +6,10 @@ Creates a cProfile of the renderFigure() function encompassing the core plotting
 The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
 This is to avoid tile loading affecting performance measurement of the core plotting task.
 """
-import cartopy
+
 import os
+import sys
+import importlib
 import numpy as np
 import contextily as ctx
 import matplotlib.pyplot as plt
@@ -15,8 +17,9 @@ import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
-from mapcompare.cProfile_viz import to_cProfile
 import requests
+importlib.reload(sys.modules['mapcompare.cProfile_viz']) # no kernel/IDE restart needed after editing cProfile_viz.py
+from mapcompare.cProfile_viz import to_cProfile
 
 outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
@@ -25,6 +28,7 @@ viz_type = 'static/' # type non-adjustable
 db_name = 'dd' 
 basemap = False
 savefig = False
+
 
 def getExtent(*gdfs):
     """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
@@ -43,8 +47,28 @@ def getExtent(*gdfs):
     
     return extent
 
+
 @to_cProfile
 def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+    """Renders the figure reproducing the map template.
+
+    Parameters
+    ----------
+    buildings_in, buildings_out, rivers : GeoDataframes
+        The three feature sets styled and added separately to the figure.
+    basemap : Boolean
+        Global scope variable determining whether or not to add an OSM basemap.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to SVG in /mapcompare/outputs/[viz_type]
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template.
+    """
     
     crs = ccrs.UTM(33)
 
@@ -77,7 +101,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     handles = buildings_in_handle + buildings_out_handle + rivers_handle 
     labels = ['Buildings within 500m of river/stream', 'Buildings outside 500m of river/stream', 'Rivers or streams']
 
-    leg = ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
+    ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
 
     fig.canvas.draw() # added since cartopy's rendering function is executed lazily and would otherwise not be included in the cProfile
 
@@ -88,6 +112,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         plt.savefig(outputdir + viz_type + "cartopy (" + db_name + ").svg", format='svg', orientation='landscape')
     else:
         pass
+
 
 if __name__ == "__main__":
     

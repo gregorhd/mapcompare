@@ -3,22 +3,27 @@
 """Plot figure using datashader's tf.shade() method. This, in effect rasterizses the vector data, creating a static image without axes, legend or projection.
 """
 import os
+import sys
+import importlib
 import numpy as np
 from spatialpandas import GeoDataFrame
 import datashader as ds
 import datashader.transfer_functions as tf
 import datashader.utils as utils
-from mapcompare.cProfile_viz import to_cProfile
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
+importlib.reload(sys.modules['mapcompare.cProfile_viz']) # no kernel/IDE restart needed after editing cProfile_viz.py
+from mapcompare.cProfile_viz import to_cProfile
+
 
 outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # not adjustable
 basemap = False # not adjustable
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 savefig = False
+
 
 def prepGDFs(buildings_in, buildings_out, rivers):
     """Prepare GeoDataFrames for use by datashader's transfer_functions.shade() method.
@@ -57,7 +62,27 @@ def prepGDFs(buildings_in, buildings_out, rivers):
 
 
 @to_cProfile
-def renderFigure(spatialpdGDF, extent, db_name=db_name, viz_type=viz_type, basemap=basemap, savefig=savefig):
+def renderFigure(spatialpdGDF, extent, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+    """Renders the figure reproducing the map template minus the basemap and legend.
+
+    Parameters
+    ----------
+    spatialpdGDF : SpatialPandas GeoDataFrame
+        GeoDataFrame containing all three feature sets.
+    basemap : Boolean
+        Global scope variable determining whether or not to add a basemap.
+        Simply used for triggering the cProfile on inspect.
+    savefig : Boolean
+        Global scope variable determining whether or not to save the current figure to PNG.
+    db_name : {'dd', 'dd_subset'}
+        Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
+    viz_type : {'static/', 'interactive/'}
+        Global scope variable indicating the visualisation type.
+    
+    Returns
+    ----------
+        A figure reproducing the map template minus the basemap and legend.
+    """
 
     color_key = {'Within_500m': 'red', 'Outside_500m': 'grey', 'River/stream': 'lightblue'}
 
@@ -72,6 +97,7 @@ def renderFigure(spatialpdGDF, extent, db_name=db_name, viz_type=viz_type, basem
         utils.export_image(tf.shade(agg, color_key=color_key), filename=outputdir + viz_type + "datashader only" + " (" + db_name + ")")
     else:
         pass
+
 
 if __name__ == "__main__":
     
