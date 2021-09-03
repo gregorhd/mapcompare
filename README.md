@@ -1,17 +1,21 @@
 
-# mapcompare
+> A comparison of Python libraries for static and interactive visualisations of large vector data. 
+> An MSc thesis at Ulster University (on-going).
+
+- [Which libraries are being compared?](#which-libraries-are-being-compared)
+- [How are libraries being compared?](#how-are-libraries-being-compared)
+- [Results](#results)
+  - [Code complexity](#code-complexity)
+  - [CPU runtime](#cpu-runtime)
+    - [Subset dataset (feature count: 2,645)](#subset-dataset-feature-count-2645)
+    - [Complete dataset (feature count: 144,727)](#complete-dataset-feature-count-144727)
+- [Output samples](#output-samples)
+  - [Static visualisations](#static-visualisations)
+  - [Interactive visualisations](#interactive-visualisations)
 
   
 
-Comparison of Python libraries for creating both static and interactive visualisations of large geospatial vector data (n=140,000+).
-
-  
-
-An MSc thesis at Ulster University (on-going).
-
-  
-
-## Which visualisation libraries are included in the comparison?
+## Which libraries are being compared?
 
   
 
@@ -36,7 +40,7 @@ The table below summarises the long-list and indicates short-listed libraries in
 
   
 
-A simple visualisation task is performed across both the static and interactive track, and secondly for both the complete dataset and a smaller subset. The complete dataset contains 144,727 polygons representing the city of Dresden's real-estate cadastre. The subset contains 2,645 polygons. Both databases are queried in PostGIS, returning three sets of results tables which are converted to *GeoPandas* GeoDataFrames to serve as inputs to the visualisation libraries. In some cases, these are converted to the respective supported data formats prior to the actual plotting task.
+A simple visualisation task is performed across both the static and interactive track, and secondly for both a complete dataset and a smaller subset. The complete dataset contains 144,727 polygons representing the city of Dresden's real-estate cadastre. The subset contains 2,645 polygons from the same dataset. Both databases are queried in PostGIS via *GeoPandas*' `from_postgis()` function, returning three *GeoPandas* GeoDataFrames to directly or indirectly serve as primary data inputs. Where required, these are converted to the respective supported data formats prior to the actual plotting task.
 
   
 
@@ -66,13 +70,30 @@ The short-listed libraries were then compared along these indicators:
 
 4.	resource requirements (output file size and, for interactive visualisations, a subjective assessment of ‘responsiveness’ on pan and zoom);
 
-5.	the time taken for the rendering portion of a script to complete, indicated as an average across a total of N runs: The rendering portion excludes data acquisition and, if required by any library, data pre-processing and conversion. CPU times were measured using the *cProfile* module after a kernel restart to prevent caching from prior runs skewing the measurement. During performance measurement, no basemap tiles were added to also not skew results due to tile fetching.
+5.	the time taken for the rendering portion of a script to complete, indicated as an average across a total of 10 runs: The rendering portion excludes data acquisition and, if required by any library, data pre-processing, reprojection or conversion. CPU times were measured using the cProfile module. The following measures were taken to ensure comparability of results:
+    *	The Python kernel was restarted before each new benchmarking session;
+    *	To prevent some libraries, such as *Cartopy*, from re-using an already drawn canvas, each run was executed manually rather than as part of a `for` loop;
+    *	During performance measurement, no basemap tiles were added and figures were not written to disk (`savefig = False`). Instead, what was being measured was the time taken for figures to be rendered inside the VSCode interactive interpreter window;
+    *	To account for some libraries’ lazy execution of underlying rendering functions, force rendering within the interactive interpreter window during the course of the function call, or prevent libraries from displaying the figure in a browser window by default, the adjustments outlined in the table below were added to respective scripts depending on libraries’ default behaviour, or their particular behaviour if central calls to, say, a `plot` or `chart` object are made within a Jupyter Notebook or the VSCode Python Extension as part of a function call:
+  
+| **Static** | **Adjustment** |  **Interactive**  | **Adjustment**  |
+|:-|:-|:-|:-|
+|*GeoPandas + Matplotlib*|`fig.canvas.draw()` (pro-forma only,<br>no effect on behaviour or performance)|*Bokeh*|`bokeh.io.output.output_notebook()`<br>…<br>`bokeh.io.show(plot)`
+|
+|*Cartopy + Matplotlib*|`fig.canvas.draw()`|*GeoViews + Bokeh*|*None*|
+|*geoplot + Matplotlib* |`matplotlib.pyplot.gcf()`|*GeoViews+ datashader + Bokeh Server*|*None*|
+|*Altair + Vega-Lite*|`altair.renderers.enable('mimetype')`<br>...<br> `IPython.display.display(chart)`|*hvPlot + HoloViews + Bokeh*|`IPython.display.display(plot)`|
+|*datashader*|*None*|*Plotly*|*None*|
+
+
 
 6.	Any other limitations or challenges encountered.
 
 
 
-## Initial Results
+## Results
+
+The more qualitative results regarding documentation are not reproduced here.
 
 ### Code complexity
 
@@ -82,9 +103,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 |--|--|
 | ![code comparison - static](comp_code_static.png) |  ![code comparison - interactive](comp_code_interactive.png)  |
 
-### CPU runtime (work in progress)
-
-The below results currently do not yet take into account the different rendering strategies of libraries which affects when _cProfile_ considers `renderFigure()` to be completed for each. How to establish an equal basis for comparison is currently being investigated.
+### CPU runtime
 
 #### Subset dataset (feature count: 2,645)
   

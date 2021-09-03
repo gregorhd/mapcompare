@@ -7,19 +7,14 @@ Create cProfile of the plotting task by default as there is currently no basemap
 Savefig via Altair Saver still buggy on Windows 10. 
 Altair outputs in mapcompare/outputs/ are simply 'Save image as...' directly from the browser.
 
-Charts can currently also not be displayed in VSCode-Python's interactive interpreter
-(this may be fixed with the August release of VSCode, see vscode-jupyter issue #4382),
-hence to-be-uncommented call to chart.show() to open chart in browser instead.
-Re-comment out chart.show() when performance benchmarking,
-as Altair Saver blocks the interpreter between runs until the browser tab is closed.
 """
 
 import os
 import sys
 import importlib
 import altair as alt
-import altair_viewer
 import json
+from IPython.display import display
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 importlib.reload(sys.modules['mapcompare.cProfile_viz']) # no kernel/IDE restart needed after editing cProfile_viz.py
@@ -27,7 +22,7 @@ from mapcompare.cProfile_viz import to_cProfile
 
 outputdir = 'mapcompare/outputs/'
 
-# as yet no discernible support for basemaps
+# as yet no support for basemaps
 basemap = False
 
 # chart.save() seems to have a number of issues on Windows
@@ -42,15 +37,13 @@ viz_type = 'static/'
 
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 
 
-# VSCode can allegeld natively display the charts in the interpreter
-# by defining alt.renderers.enable('mimetype') 
-# As of VSCode v1.59 this did not work
+# VSCode can natively display the charts in the interpreter
 # https://altair-viz.github.io/user_guide/display_frontends.html#displaying-in-vscode
 
-alt.renderers.enable('notebook')
+alt.renderers.enable('mimetype')
 
 
 def prepGDFs(*gdfs):
@@ -112,7 +105,9 @@ def renderFigure(json_features, basemap=basemap, db_name=db_name, viz_type=viz_t
         color=alt.Color("properties.Legend:N", scale=alt.Scale(domain=domain, range=range_), legend=alt.Legend(title='Legend', orient='top-right'))
     )
 
-    altair_viewer.display(chart)
+    # altair_viewer.display(chart)
+
+    display(chart)
     
     if savefig:
         if not os.path.exists(outputdir + viz_type):

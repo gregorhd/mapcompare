@@ -8,9 +8,12 @@ from bokeh.models.ranges import Range1d
 from bokeh.io import show
 from bokeh.models import GeoJSONDataSource, Range1d
 from bokeh.plotting import figure
+from bokeh.io.output import output_notebook
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from bokeh.tile_providers import OSM, get_provider
+
+output_notebook()
 
 # INPUTS
 db_name = 'dd_subset'

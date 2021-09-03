@@ -16,8 +16,8 @@ import docx
 from mapcompare.cProfile_viz import num_times
 
 # INPUTS
-viz_type = 'interactive/'
-db_name = 'dd_subset'
+viz_type = 'static/'
+db_name = 'dd'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
 
@@ -111,6 +111,8 @@ if __name__ == "__main__":
 
     plt.savefig('comp_profile_' + viz_type[:-1] + '_' + db_name, facecolor='white')
 
+    """Create a docx containing the final dataframe
+
     # open an existing document
     doc = docx.Document()
 
@@ -129,6 +131,7 @@ if __name__ == "__main__":
 
     # save the doc
     doc.save(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' dataframe.docx')
+    """
 
     # snakeviz('carto', 'static/', 'dd')
     

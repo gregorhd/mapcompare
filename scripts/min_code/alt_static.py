@@ -4,7 +4,7 @@
 """
 
 import altair as alt
-import altair_viewer
+from IPython.display import display
 import json
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         color=alt.Color("properties.category:N", scale=alt.Scale(domain=domain, range=range_), legend=alt.Legend(title='Legend', orient='top-right'))
     )
 
-    altair_viewer.display(chart)
+    display(chart)
 
     
 

@@ -33,8 +33,6 @@ if __name__ == "__main__":
 
     merged = prepGDFs(buildings_in, buildings_out, rivers)
 
-    plot = (
-        merged.hvplot(geo=True, cmap=['red', 'lightgrey', 'lightblue'], tiles='OSM', hover_cols=['Legend', 'Building use'], xaxis=None, yaxis=None, legend='top_right', height=500)
-        )
+    plot = (merged.hvplot(geo=True, cmap=['red', 'lightgrey', 'lightblue'], tiles='OSM', hover_cols=['Legend', 'Building use'], xaxis=None, yaxis=None, legend='top_right', height=500))
         
     hvplot.show(plot)

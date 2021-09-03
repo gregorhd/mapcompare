@@ -9,6 +9,7 @@ This is to avoid tile loading affecting performance measurement of the core plot
 
 import os
 import hvplot.pandas
+from IPython.display import display
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
@@ -17,7 +18,7 @@ outputdir = "mapcompare/outputs/"
 viz_type = 'interactive/'
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 basemap = False
 savefig = False
 
@@ -75,14 +76,16 @@ def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_
         merged.hvplot(geo=True, cmap=['red', 'lightgrey', 'lightblue'], hover_cols=['Legend', 'Building use'], xaxis=None, yaxis=None, legend='top_right', height=500)
         )
         
-    hvplot.show(plot)
-
     if savefig:
         if not os.path.exists(outputdir + viz_type):
             os.makedirs(outputdir + viz_type)
 
         hvplot.save(plot, outputdir + viz_type + "hvPlot (" + db_name + ").html")
 
+    # Calling display() here for plot to show in VSCode-Python.
+    # This only works occasionally wherease "return plot" does not work at all, though it allegedly works in an actual Jupyter Notebook:
+    # https://stackoverflow.com/questions/65907096/hvplot-call-inside-function-does-not-display-in-jupyter-notebook
+    display(plot)
 
 if __name__ == "__main__":
 
@@ -91,3 +94,5 @@ if __name__ == "__main__":
     merged = prepGDFs(buildings_in, buildings_out, rivers)
 
     renderFigure(merged)
+
+

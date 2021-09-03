@@ -11,6 +11,7 @@ import os
 import numpy as np
 from bokeh.models.ranges import Range1d
 from bokeh.io import output_file, show
+from bokeh.io.output import output_notebook
 from bokeh.models import GeoJSONDataSource, Range1d
 from bokeh.plotting import figure
 from mapcompare.sql2gdf import sql2gdf
@@ -18,11 +19,15 @@ from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 from bokeh.tile_providers import OSM, get_provider
 
+# required to display plot in VSCode or a Jupyter Notebook
+# See https://docs.bokeh.org/en/latest/docs/first_steps/first_steps_7.html#displaying-in-a-jupyter-notebook
+output_notebook()
+
 outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 basemap = False
 savefig = False
 
@@ -112,9 +117,8 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         output_file(filename=outputdir + viz_type + "bokeh" + " (" + db_name + ").html")
     else:
         pass
-
+        
     show(p)
-
 
 if __name__ == "__main__":
 
@@ -123,4 +127,5 @@ if __name__ == "__main__":
     ((buildings_in, buildings_out, rivers), extent, aspect_ratio) = prepGDFs(buildings_in, buildings_out, rivers)
 
     renderFigure(buildings_in, buildings_out, rivers)
+
 

@@ -103,8 +103,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     # and figure finally rendering in the interpreter,
     # without the draw() geoplot runtime is 30% below Cartopy's and 40% below GeoPandas' which seems odd...
     # Final inclusion of the draw() pending confirmation with developers
-    fig = plt.gcf()
-    fig.canvas.draw()
+    plt.gcf()
 
     if savefig:
         if not os.path.exists(outputdir + viz_type):
