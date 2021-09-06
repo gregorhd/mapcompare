@@ -2,15 +2,9 @@
 
 """Plot figure using plotly.py's express.choropleth() (without basemap) or express.choropleth_mapbox() methods (with basemap).
 
-Creates a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
-This is to avoid tile loading affecting performance measurement of the core plotting task.
-
-IMPORTANT: If performance benchmarking using the complete dataset,
-this script needs to be executed repeatedly by the user, preferably using "ipython -i plotly_py.py" rather than VSCode-Python's interpreter. Otherwise,
-the interpreter fails to complete or crashes after run 1. 
-A message indicates the number of runs left or if the required
-number of profiles is present in the profiles folder.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 """
 
 import os

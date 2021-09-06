@@ -4,9 +4,10 @@
 
 Create cProfile of the plotting task by default as there is currently no basemap functionality for Altair.
 
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/).
+
 Savefig via Altair Saver still buggy on Windows 10. 
 Altair outputs in mapcompare/outputs/ are simply 'Save image as...' directly from the browser.
-
 """
 
 import os

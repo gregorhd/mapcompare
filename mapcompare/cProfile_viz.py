@@ -1,9 +1,8 @@
-"""Defines the to_cProfile() decorator function applied to renderFigure() in the executables for each visualisation library.
+"""Defines the to_cProfile() decorator applied to renderFigure() in the executables for each visualisation library.
 
-cProfiles are only created for decorated functions, if basemap=False to not skew results due to tile fetching.
+cProfiles are only created for decorated functions, if basemap=False and savefig=False to not skew results due to tile fetching or writing to disk.
 """
 
-from subprocess import STARTF_USESHOWWINDOW
 import wrapt
 import os
 import re
@@ -26,6 +25,8 @@ def to_cProfile(func, instance, args, kwargs):
 
     basemap_val = str(inspect.signature(func).parameters['basemap'])[-5:]
 
+    savefig_val = str(inspect.signature(func).parameters['savefig'])[-5:]
+
     profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
 
     if not os.path.exists(profiledir):
@@ -38,7 +39,7 @@ def to_cProfile(func, instance, args, kwargs):
     This is to keep approaches like reuse of already drawn canvases from skewing results.
     """
     
-    if basemap_val == 'False' and not mod_name.startswith('ds'):
+    if basemap_val == 'False' and savefig_val == 'False' and not mod_name.startswith('ds'):
 
         profilepath = profiledir + mod_name[:-3] + ' (' + db_name + ")" + " run " + str(num_times) + ".prof"
 
@@ -78,7 +79,7 @@ def to_cProfile(func, instance, args, kwargs):
     # execute datashader's renderFigure() in a loop to demonstrate effect of numba
     # on performance during first and subsequent runs
     
-    elif mod_name.startswith('ds'):
+    elif mod_name.startswith('ds') and savefig_val == 'False':
         
         for i in range(num_times):
 

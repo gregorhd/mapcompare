@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 """Plot figure using datashader's tf.shade() method. This, in effect rasterizses the vector data, creating a static image without axes, legend or projection.
+
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if savefig=False. 
+This is to avoid writing to disk affecting performance measurement of the core plotting task.
 """
 import os
 import sys

@@ -3,9 +3,9 @@
 """Plot figure using HoloViews, datashader and Bokeh in conjunction. Following this example:
 https://examples.pyviz.org/nyc_buildings/nyc_buildings.html
 
-Creates a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
-This is to avoid tile loading affecting performance measurement of the core plotting task.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 
 Running this script as is, will produce a static rasterisation of the polygons not updated when zooming in.
 

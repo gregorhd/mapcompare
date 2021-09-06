@@ -2,9 +2,9 @@
 
 """Plot figure using Bokeh's figure.patches method.
 
-Create cProfile of the plotting task only if no basemap is added.
-    
-This is to avoid tile loading affecting performance measurement of the core rendering functionality.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 """
 
 import os
@@ -14,7 +14,7 @@ from bokeh.io import output_file, show
 from bokeh.io.output import output_notebook
 from bokeh.models import GeoJSONDataSource, Range1d
 from bokeh.plotting import figure
-from mapcompare.sql2gdf import sql2gdf
+from mapcompare.sql2gdf import sql2gdf, timer
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
 from bokeh.tile_providers import OSM, get_provider
@@ -27,11 +27,11 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 basemap = False
 savefig = False
 
-
+@timer
 def prepGDFs(*gdfs):
     """Convertes GDFs to Web Mercator to line up with tiled basemaps fetched by Bokeh. Returns combined bounding box (extent) and aspect_ratio.
     """

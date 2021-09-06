@@ -2,9 +2,9 @@
 
 """Plot figure using cartopy's GeoAxes.add_geometries() interface to matplotlib.
 
-Creates a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
-This is to avoid tile loading affecting performance measurement of the core plotting task.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 """
 
 import os
@@ -25,9 +25,9 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd' 
+db_name = 'dd_subset' 
 basemap = False
-savefig = False
+savefig = True
 
 
 def getExtent(*gdfs):

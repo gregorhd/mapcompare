@@ -12,11 +12,11 @@ import glob
 import subprocess
 from datetime import datetime
 import matplotlib.pyplot as plt
-import docx
+import docx # uncomment last section below to save dataframe to docx
 from mapcompare.cProfile_viz import num_times
 
 # INPUTS
-viz_type = 'static/'
+viz_type = 'interactive/'
 db_name = 'dd'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
@@ -111,27 +111,27 @@ if __name__ == "__main__":
 
     plt.savefig('comp_profile_' + viz_type[:-1] + '_' + db_name, facecolor='white')
 
-    """Create a docx containing the final dataframe
+    # # Create a docx containing the final dataframe
 
-    # open an existing document
-    doc = docx.Document()
+    # # open an existing document
+    # doc = docx.Document()
 
-    # add a table to the end and create a reference variable
-    # extra row is so we can add the header row
-    t = doc.add_table(df1.shape[0]+1, df1.shape[1])
+    # # add a table to the end and create a reference variable
+    # # extra row is so we can add the header row
+    # t = doc.add_table(df1.shape[0]+1, df1.shape[1])
 
-    # add the header rows.
-    for j in range(df1.shape[-1]):
-        t.cell(0,j).text = df1.columns[j]
+    # # add the header rows.
+    # for j in range(df1.shape[-1]):
+    #     t.cell(0,j).text = df1.columns[j]
 
-    # add the rest of the data frame
-    for i in range(df1.shape[0]):
-        for j in range(df1.shape[-1]):
-            t.cell(i+1,j).text = str(df1.values[i,j])
+    # # add the rest of the data frame
+    # for i in range(df1.shape[0]):
+    #     for j in range(df1.shape[-1]):
+    #         t.cell(i+1,j).text = str(df1.values[i,j])
 
     # save the doc
-    doc.save(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' dataframe.docx')
-    """
+    # doc.save(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' dataframe.docx')
+    
 
-    # snakeviz('carto', 'static/', 'dd')
+    # snakeviz('bkh', 'interactive/', 'dd')
     

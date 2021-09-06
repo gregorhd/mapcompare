@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 # INPUTS
-viz_type = 'static'
+viz_type = 'interactive'
 
 if not '\\'.join(__file__.split('\\')[:-1]) == os.getcwd():
     os.chdir('scripts/min_code/')

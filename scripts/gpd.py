@@ -2,9 +2,9 @@
 
 """Plot figure using GeoPandas' GeoDataFrame.plot() interface to matplotlib.
 
-Creates a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
-This is to avoid tile loading affecting performance measurement of the core plotting task.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 """
 
 import os

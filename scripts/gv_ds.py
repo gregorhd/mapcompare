@@ -6,9 +6,9 @@ The only difference between this script and HoloViews+datashader+Bokeh Server in
 is the declaration of a Cartopy CRS object in line 79: polys = gv.Polygons(spatialpdGDF, crs=ccrs.GOOGLE_MERCATOR, vdims='category'), and a slight
 difference in the location of the tiles module in line 86:  tiles = gv.tile_sources.OSM().opts(...)
 
-Creates a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
-This is to avoid tile loading affecting performance measurement of the core plotting task.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 
 Running this script as is, will produce a static rasterisation of the polygons not updated when zooming in.
 

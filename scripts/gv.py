@@ -2,9 +2,9 @@
 
 """Plot figure using GeoViews' Polygons class and utilizing either the Bokeh or matplotlib backend.
 
-Creates a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False. 
-This is to avoid tile loading affecting performance measurement of the core plotting task.
+Create a cProfile of the renderFigure() function encompassing the core plotting task.
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 """
 
 import os
@@ -18,6 +18,7 @@ from mapcompare.cProfile_viz import to_cProfile
 from cartopy import crs as ccrs
 
 gv.extension('bokeh', 'matplotlib')
+
 outputdir = "mapcompare/outputs/"
 
 # static interface to mpl not included in short-list but generally works, except for the legend and some quirky symbology when saving to .svg
@@ -26,7 +27,7 @@ outputdir = "mapcompare/outputs/"
 viz_type = 'interactive/'
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 basemap = False    
 savefig = False
 
@@ -101,9 +102,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
         # color_index=None makes GeoViews ignore the automatically identified 'use' values dimension according to which
         # a color scheme would otherwise be applied
-        buildings_in = gv.Polygons(buildings_in).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
-        buildings_out = gv.Polygons(buildings_out).opts(tools=['hover'], color_index=None, color='lightgrey')
-        rivers = gv.Polygons(rivers).opts(color='lightblue')
+        buildings_in = gv.Polygons(buildings_in, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
+        buildings_out = gv.Polygons(buildings_out, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='lightgrey')
+        rivers = gv.Polygons(rivers, crs=ccrs.GOOGLE_MERCATOR).opts(color='lightblue')
 
         features = buildings_in * buildings_out * rivers * tiles
 
@@ -120,12 +121,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
         layout = (features * legend).opts(width=700, height=500, title=title)
 
-        # gv.Element() does not show in VS Code interpreter, hence this workaround with
-        # gv.render and bokeh.plotting.show,
-        # otherwise use (gv.Overlay(features * legend).opts())
-        p = gv.render(layout)
-        
-        show(p)
+        show(gv.render(layout))
     
     elif basemap == False and viz_type == 'interactive/':
 
@@ -148,12 +144,8 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
         layout = (features * legend).opts(width=700, height=500, title=title)
 
-        gv.operation.resample_geometry(layout).opts(width=400, height=400)
+        show(gv.render(layout))
 
-        p = gv.render(layout)
-
-        show(p)
-        
     elif basemap == False and viz_type == 'static/':           
     
         layout = (gv.Polygons(buildings_in, group="buildings_in") * gv.Polygons(buildings_out, group="buildings_out") * gv.Polygons(rivers, group="rivers")).opts(projection=ccrs.Mercator())
