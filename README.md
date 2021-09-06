@@ -79,8 +79,7 @@ The short-listed libraries were then compared along these indicators:
 | **Static** | **Adjustment** |  **Interactive**  | **Adjustment**  |
 |:-|:-|:-|:-|
 |*GeoPandas + Matplotlib*|`fig.canvas.draw()` (pro-forma only,<br>no effect on behaviour or performance)|*Bokeh*|`bokeh.io.output.output_notebook()`<br>…<br>`bokeh.io.show(plot)`|
-|*Cartopy + Matplotlib*|`fig.canvas.draw()`|GeoViews + Bokeh*|`bokeh.plotting.show(gv.render(plot))`
-|
+|*Cartopy + Matplotlib*|`fig.canvas.draw()`|GeoViews + Bokeh*|`bokeh.plotting.show(gv.render(plot))`|
 |*geoplot + Matplotlib* |`matplotlib.pyplot.gcf()`|*GeoViews+ datashader + Bokeh Server*|*None*|
 |*Altair + Vega-Lite*|`altair.renderers.enable('mimetype')`<br>...<br> `IPython.display.display(chart)`|*hvPlot + HoloViews + Bokeh*|`IPython.display.display(plot)`|
 |*datashader*|*None*|*Plotly*|*None*|
