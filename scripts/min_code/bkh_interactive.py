@@ -42,14 +42,7 @@ if __name__ == "__main__":
 
     ((gdf1, gdf2, gdf3), extent, aspect_ratio) = prepGDFs(gdf1, gdf2, gdf3)
 
-    p = figure(title="Click on a legend entry to hide/unhide features",
-            aspect_ratio=aspect_ratio,
-            plot_height=600, 
-            background_fill_color="white",
-            tooltips=[('Building use', '@use')],
-            x_range=Range1d(extent[0], extent[1]),
-            y_range=Range1d(extent[2], extent[3]),
-        )
+    p = figure(title="Click on a legend entry to hide/unhide features",  aspect_ratio=aspect_ratio, plot_height=600, background_fill_color="white", tooltips=[('Building use', '@use')], x_range=Range1d(extent[0], extent[1]), y_range=Range1d(extent[2], extent[3]))
         
     p.add_tile(get_provider(OSM))
 

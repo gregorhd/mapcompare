@@ -2,7 +2,7 @@
 
 """Create bar chart of total cProfile run time of renderFigure across all tested libraries for either the interactive or static track and either the full ('dd') or subset ('dd_subset') database.
 
-Commented out: display snakeviz icicle graph in browser for a single cProfile.
+Commented out: (a) display snakeviz icicle graph in browser for a single cProfile, (b) save final dataframe to docx table.
 """
 
 import io
@@ -17,7 +17,7 @@ from mapcompare.cProfile_viz import num_times
 
 # INPUTS
 viz_type = 'interactive/'
-db_name = 'dd'
+db_name = 'dd_subset'
 
 profiledir = 'mapcompare/profiles/' + viz_type + db_name + "/"
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     # Plot cumtimes to bar chart
 
-    ax = df1.plot.bar(x=x_label, y="mean", yerr=list(df1['std']), ecolor='grey', capsize=5, alpha=0.5, ylabel="seconds", rot='horizontal', title="cProfile: mean cumulative CPU time ("+ str(num_times) + ' runs)', legend=False)
+    ax = df1.plot.bar(x=x_label, y="mean", yerr=list(df1['std']), ecolor='grey', capsize=5, alpha=0.5, ylabel="seconds", rot='horizontal', title="cProfile: mean cumulative CPU runtime ("+ str(num_times) + ' runs)', legend=False)
 
     for i in range(len(df1['mean'])):
         plt.annotate("{:.2f}".format(df1['mean'][i]) + 's', xy=(df.index[i], df1['mean'][i]), ha='center', va='bottom')

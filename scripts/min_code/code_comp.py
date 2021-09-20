@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 # INPUTS
-viz_type = 'interactive'
+viz_type = 'static'
 
 if not '\\'.join(__file__.split('\\')[:-1]) == os.getcwd():
     os.chdir('scripts/min_code/')
@@ -27,10 +27,10 @@ df = pd.DataFrame(line_dict.items(), columns=['library','code_num'])
 df['library'] = [lib_name.split('_' + viz_type)[0] for lib_name in df['library']]
 
 if viz_type == 'interactive':
-    rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nHoloViews+\nBokeh'}
+    rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py\n(auto\nzoom)', 'plotly_py_manual': 'Plotly.py\n(manual\nzoom)', 'gv': 'GeoViews\n+Bokeh', 'gv_ds': 'GeoViews\n+datashader\n+Bokeh Server', 'hv_plot': 'hvPlot\n+Bokeh'}
 
 else:
-    rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib*'}
+    rename_dict = {'alt': 'Altair\n+Vega-Lite', 'carto': 'Cartopy\n+Matplotlib', 'ds': 'Data-\nshader', 'gpd': 'GeoPandas\n+Matplotlib', 'gplt': 'geoplot\n+Matplotlib'}
         
 df['library'].replace(rename_dict, inplace=True)
 

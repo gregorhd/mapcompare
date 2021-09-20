@@ -18,7 +18,7 @@ outputdir = "mapcompare/outputs/"
 viz_type = 'interactive/'
 
 # INPUTS
-db_name = 'dd_subset'
+db_name = 'dd'
 basemap = False
 savefig = False
 

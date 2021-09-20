@@ -52,4 +52,4 @@ if __name__ == "__main__":
     # gv.Element() does not show in VS Code interpreter, hence this workaround with
     # gv.render and bokeh.plotting.show,
     # otherwise use (gv.Overlay(features * legend).opts())
-    show(gv.render(layout))    
+    show(gv.render(layout))

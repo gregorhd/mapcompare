@@ -29,11 +29,8 @@ def prepGDFs(*gdfs):
         """
         # longitudinal range by zoom level (20 to 1)
         # in degrees, if centered at equator
-        lon_zoom_range = np.array([
-            0.0007, 0.0014, 0.003, 0.006, 0.012, 0.024, 0.048, 0.096,
-            0.192, 0.3712, 0.768, 1.536, 3.072, 6.144, 11.8784, 23.7568,
-            47.5136, 98.304, 190.0544, 360.0
-        ])
+        lon_zoom_range = np.array([0.0007, 0.0014, 0.003, 0.006, 0.012, 0.024, 0.048, 0.096, 0.192, 0.3712, 0.768, 1.536, 3.072, 6.144, 11.8784, 23.7568, 47.5136, 98.304, 190.0544, 360.0])
+        
         margin = 2
         height = (maxlat - minlat) * margin * width_to_height
         width = (maxlon - minlon) * margin
@@ -84,20 +81,15 @@ if __name__ == "__main__":
 
     merged, zoom, centerx, centery, tempdir = prepGDFs(gdf1, gdf2, gdf3)
 
-    title = 'Click on a legend entry to hide/unhide features'
-
     # Plot with tile map using px.choropleth_mapbox()
     # This seems to always require a .json temp file
 
     with open(tempdir + "plotly_py (" + db_name + ").json") as f:
         geojson = json.load(f)
 
-    fig = px.choropleth_mapbox(merged, geojson=geojson, locations=merged['id'], title=title, color=merged['Legend'], color_discrete_map={
-    'Label1':'red',
-    'Label2':'lightgrey',
-    'Label3':'lightblue'}, hover_data={'id': False, 'Legend': False, 'Building use':True}, mapbox_style="open-street-map", center={'lat': centery, 'lon': centerx}, zoom=zoom, featureidkey='properties.id')
+    fig = px.choropleth_mapbox(merged, geojson=geojson, locations=merged['id'], title=title, color=merged['Legend'], color_discrete_map={'Label1':'red', 'Label2':'lightgrey', 'Label3':'lightblue'}, hover_data={'id': False, 'Legend': False, 'Building use':True}, mapbox_style="open-street-map", center={'lat': centery, 'lon': centerx}, zoom=zoom, featureidkey='properties.id')
     
     fig.update_geos(projection_type="mercator")
-    fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0}, title_text=title, title_font_size=12)
+    fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0}, title_text='Click on a legend entry to hide/unhide features', title_font_size=12)
 
     fig.show()

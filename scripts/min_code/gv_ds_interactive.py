@@ -65,11 +65,9 @@ if __name__ == "__main__":
     shaded = datashade(polys, color_key=color_key, aggregator=ds.by('category', ds.any()))
     hover = inspect_polygons(shaded).opts(fill_color='purple', tools=['hover'])
 
-    tiles = gv.tile_sources.OSM().opts(
-    min_height=500, responsive=True, xaxis=None, yaxis=None)
+    tiles = gv.tile_sources.OSM().opts(min_height=500, responsive=True, xaxis=None, yaxis=None)
 
     layout = tiles * shaded * hover * legend
 
     doc = gv.renderer('bokeh').server_doc(layout)
     doc.title = 'GeoViews + Datashader + Bokeh App'
-
