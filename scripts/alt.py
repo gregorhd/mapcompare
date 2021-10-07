@@ -15,6 +15,7 @@ import sys
 import importlib
 import altair as alt
 import json
+from geopandas import GeoDataFrame
 from IPython.display import display
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
@@ -24,7 +25,7 @@ from mapcompare.cProfile_viz import to_cProfile
 outputdir = 'mapcompare/outputs/'
 
 # as yet no support for basemaps
-basemap = False
+basemap = True
 
 # chart.save() seems to have a number of issues on Windows
 # see https://github.com/altair-viz/altair_saver/issues/72 and 
@@ -38,7 +39,7 @@ viz_type = 'static/'
 
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 
 
 # VSCode can natively display the charts in the interpreter
@@ -47,7 +48,7 @@ db_name = 'dd'
 alt.renderers.enable('mimetype')
 
 
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: GeoDataFrame) -> dict:
     """Prepare GeoDataFrames for use by Altair's alt.Data() class.
 
     This step is separated from actual rendering to not affect performance measurement. 
@@ -69,7 +70,7 @@ def prepGDFs(*gdfs):
 
 
 @to_cProfile
-def renderFigure(json_features, basemap=basemap, db_name=db_name, viz_type=viz_type):
+def renderFigure(json_features: dict, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters

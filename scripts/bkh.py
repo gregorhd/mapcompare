@@ -9,11 +9,13 @@ This is to avoid tile loading or writing to disk affecting performance measureme
 
 import os
 import numpy as np
+from typing import List, Tuple
 from bokeh.models.ranges import Range1d
 from bokeh.io import output_file, show
 from bokeh.io.output import output_notebook
 from bokeh.models import GeoJSONDataSource, Range1d
 from bokeh.plotting import figure
+from geopandas import GeoDataFrame
 from mapcompare.sql2gdf import sql2gdf, timer
 from mapcompare.misc.pw import password
 from mapcompare.cProfile_viz import to_cProfile
@@ -27,12 +29,12 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd'
-basemap = False
+db_name = 'dd_subset'
+basemap = True
 savefig = False
 
 @timer
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: GeoDataFrame) -> Tuple[Tuple[GeoDataFrame], List[np.float64], np.float64]:
     """Convertes GDFs to Web Mercator to line up with tiled basemaps fetched by Bokeh. Returns combined bounding box (extent) and aspect_ratio.
     """
     gdfs = [gdf.to_crs(epsg=3857) for gdf in gdfs]
@@ -48,11 +50,11 @@ def prepGDFs(*gdfs):
 
     aspect_ratio = (extent[1] - extent [0]) / (extent[3] - extent[2])
 
-    return (gdfs, extent, aspect_ratio)
+    return gdfs, extent, aspect_ratio
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(*gdfs: GeoDataFrame, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters
@@ -101,9 +103,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     p.yaxis.visible = False
         
     # Add features
-    p.patches('xs', 'ys', legend_label="Buildings within 500m of river/stream", color='red', source=GeoJSONDataSource(geojson=buildings_in.to_json()))
-    p.patches('xs', 'ys', legend_label="Buildings outside 500m of river/stream", color='lightgrey', line_color='black', line_width=0.5, source=GeoJSONDataSource(geojson=buildings_out.to_json()))
-    p.patches('xs', 'ys', legend_label="River/stream", color='lightblue', line_color='blue', line_width=0.25, source=GeoJSONDataSource(geojson=rivers.to_json()))
+    p.patches('xs', 'ys', legend_label="Buildings within 500m of river/stream", color='red', source=GeoJSONDataSource(geojson=gdfs[0].to_json()))
+    p.patches('xs', 'ys', legend_label="Buildings outside 500m of river/stream", color='lightgrey', line_color='black', line_width=0.5, source=GeoJSONDataSource(geojson=gdfs[1].to_json()))
+    p.patches('xs', 'ys', legend_label="River/stream", color='lightblue', line_color='blue', line_width=0.25, source=GeoJSONDataSource(geojson=gdfs[2].to_json()))
 
         
     p.legend.location = "top_right"
@@ -124,7 +126,7 @@ if __name__ == "__main__":
 
     buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
 
-    ((buildings_in, buildings_out, rivers), extent, aspect_ratio) = prepGDFs(buildings_in, buildings_out, rivers)
+    (buildings_in, buildings_out, rivers), extent, aspect_ratio = prepGDFs(buildings_in, buildings_out, rivers)
 
     renderFigure(buildings_in, buildings_out, rivers)
 

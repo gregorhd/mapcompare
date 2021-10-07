@@ -10,6 +10,8 @@ This is to avoid tile loading or writing to disk affecting performance measureme
 import os
 import sys
 import importlib
+from typing import List
+from geopandas.geodataframe import GeoDataFrame
 import numpy as np
 import contextily as ctx
 import matplotlib.pyplot as plt
@@ -26,11 +28,11 @@ viz_type = 'static/' # non-adjustable
 
 # INPUTS
 db_name = 'dd_subset' 
-basemap = False
+basemap = True
 savefig = False
 
 
-def getExtent(*gdfs):
+def getExtent(*gdfs: GeoDataFrame) -> List[np.float64]:
     """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
 
     This step is separated from actual rendering to not affect performance measurement.
@@ -49,7 +51,7 @@ def getExtent(*gdfs):
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(*gdfs, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters
@@ -71,9 +73,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     """
     
     # Get number of features per GDF, to display in legend
-    buildings_in_no = str(len(buildings_in.index))
-    buildings_out_no = str(len(buildings_out.index))
-    rivers_no = str(len(rivers.index))
+    buildings_in_no = str(len(gdfs[0].index))
+    buildings_out_no = str(len(gdfs[1].index))
+    rivers_no = str(len(gdfs[2].index))
 
     crs = ccrs.UTM(33)
 
@@ -101,9 +103,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     # See: https://github.com/geopandas/geopandas/issues/1269.
     """
     
-    buildings_in.plot(ax=ax, facecolor='red')
-    buildings_out.plot(ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
-    rivers.plot(ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
+    gdfs[0].plot(ax=ax, facecolor='red')
+    gdfs[1].plot(ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+    gdfs[2].plot(ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
    
     if basemap:
         try:

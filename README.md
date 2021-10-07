@@ -1,6 +1,6 @@
 
 > A comparison of Python libraries for static and interactive visualisations of large vector data. 
-> An MSc thesis at Ulster University (on-going).
+> An MSc thesis at Ulster University.
 
 - [Which libraries are being compared?](#which-libraries-are-being-compared)
 - [How are libraries being compared?](#how-are-libraries-being-compared)
@@ -71,10 +71,10 @@ The short-listed libraries were then compared along these indicators:
 
 4.	resource requirements (output file size and, for interactive visualisations, a subjective assessment of ‘responsiveness’ on pan and zoom);
 
-5.	5.	the cumulative CPU runtime required for the Python-based portion of the rendering function to complete, indicated as an average across a total of 10 runs: The rendering portion excludes data acquisition and, if required by any library, data pre-processing, reprojection or conversion. CPU times were measured using the *cProfile* module before writing the results of individual runs to labelled `.prof` files for later extraction and analysis. For the interactive track, as rendering is ultimately performed by the execution of *JavaScript* code, *cProfile* will not capture the entirety of the processing costs. The following measures were taken to ensure comparability of results:
+5.	the cumulative CPU runtime required for the Python-based portion of the rendering function to complete, indicated as an average across a total of 10 runs: The rendering portion excludes data acquisition and, if required by any library, data pre-processing, reprojection or conversion. CPU times were measured using the *cProfile* module before writing the results of individual runs to labelled `.prof` files for later extraction and analysis. For the interactive track, as rendering is ultimately performed by the execution of *JavaScript* code, *cProfile* will not capture the entirety of the processing costs. The following measures were taken to ensure comparability of results:
     *	The Python kernel was restarted before each new benchmarking session;
     *	To prevent some libraries, such as *Cartopy*, from re-using an already drawn canvas, each run was executed manually rather than as part of a `for` loop (with the exception of the ‘out of competition’ runs of *datashader*), even though labelling of the `.prof` files was automated through a `for` loop;
-    *	During performance measurement, no basemap tiles were added (`basemap=False` and figures were not written to disk (`savefig=False`);
+    *	During performance measurement, no basemap tiles were added (`basemap=False`) and figures were not written to disk (`savefig=False`);
     *	To account for some libraries’ lazy execution of underlying rendering functions, force rendering within the interactive interpreter window during the course of the function call, or prevent libraries from displaying the figure in a browser window by default, the adjustments outlined in the table below were added to respective scripts depending on libraries’ default behaviour, or their particular behaviour if central calls to, say, a `plot` or `chart` object are made within a Jupyter Notebook or the VSCode Python Extension as part of a function call:
   
 | **Static** | **Adjustment** |  **Interactive**  | **Adjustment**  |

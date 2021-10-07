@@ -12,6 +12,8 @@ This is to avoid tile loading or writing to disk affecting performance measureme
 import os
 import sys
 import importlib
+from typing import Tuple, List
+from geopandas.geodataframe import GeoDataFrame
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -26,12 +28,12 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd' 
-basemap = False
+db_name = 'dd_subset' 
+basemap = True
 savefig = False
 
 
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: GeoDataFrame) -> Tuple[Tuple[GeoDataFrame], List[np.float64]]:
     """Convert GDFs to geographic coordinates as expected by geoplot and calculates the combined bounding box (extent) of all GDFs.
 
     This step is separated from actual rendering to not affect performance measurement.
@@ -52,7 +54,7 @@ def prepGDFs(*gdfs):
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(*gdfs, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type):
     """Renders the figure reproducing the map template.
 
     Parameters
@@ -74,19 +76,19 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     """
     
      # Get number of features per GDF, to display in legend
-    buildings_in_no = str(len(buildings_in.index))
-    buildings_out_no = str(len(buildings_out.index))
-    rivers_no = str(len(rivers.index))
+    buildings_in_no = str(len(gdfs[0].index))
+    buildings_out_no = str(len(gdfs[1].index))
+    rivers_no = str(len(gdfs[2].index))
 
     if basemap:
-        ax = gplt.webmap(buildings_in, extent=extent, projection=gcrs.WebMercator(), figsize=(20, 10))
-        gplt.polyplot(buildings_in, ax=ax, facecolor='red', zorder=3)
-        gplt.polyplot(buildings_out, ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1, zorder=2)
-        gplt.polyplot(rivers, ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25, zorder=1)
+        ax = gplt.webmap(gdfs[0], extent=extent, projection=gcrs.WebMercator(), figsize=(20, 10))
+        gplt.polyplot(gdfs[0], ax=ax, facecolor='red', zorder=3)
+        gplt.polyplot(gdfs[1], ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1, zorder=2)
+        gplt.polyplot(gdfs[2], ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25, zorder=1)
     else:
-        ax = gplt.polyplot(buildings_in, extent=extent, projection=gcrs.Mercator(), facecolor='red', figsize=(20, 10))
-        gplt.polyplot(buildings_out, ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
-        gplt.polyplot(rivers, ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
+        ax = gplt.polyplot(gdfs[0], extent=extent, projection=gcrs.Mercator(), facecolor='red', figsize=(20, 10))
+        gplt.polyplot(gdfs[1], ax=ax, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+        gplt.polyplot(gdfs[2], ax=ax, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
     # Legend
 

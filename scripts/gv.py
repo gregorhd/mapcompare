@@ -8,6 +8,8 @@ This is to avoid tile loading or writing to disk affecting performance measureme
 """
 
 import os
+from typing import List, Tuple
+from geopandas.geodataframe import GeoDataFrame
 import numpy as np
 import geoviews as gv
 from geoviews import opts
@@ -28,18 +30,18 @@ viz_type = 'interactive/'
 
 # INPUTS
 db_name = 'dd_subset'
-basemap = False    
+basemap = True    
 savefig = False
 
 
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: GeoDataFrame) -> Tuple[Tuple[GeoDataFrame], int]:
     """Transforms gdfs to EPSG:3857 (for Bokeh) or EPSG:4326 (for mpl) and renames the 'geom' column to 'geometry'. The latter is required pending a bug fix by GeoViews (see GeoViews issue #506).
 
     Also calculates an appropriate zoom level if a tiled basemap is added while using the Matplotlib backend.
 
     These steps are separated from actual rendering to not affect performance measurement.
     """
-    def getBBox(*gdfs):
+    def getBBox(*gdfs: GeoDataFrame) -> List[np.float64]:
         """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
         """
 
@@ -94,7 +96,7 @@ def prepGDFs(*gdfs):
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(*gdfs: GeoDataFrame, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     
     tiles = gv.tile_sources.OSM()
     
@@ -102,9 +104,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
         # color_index=None makes GeoViews ignore the automatically identified 'use' values dimension according to which
         # a color scheme would otherwise be applied
-        buildings_in = gv.Polygons(buildings_in, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
-        buildings_out = gv.Polygons(buildings_out, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='lightgrey')
-        rivers = gv.Polygons(rivers, crs=ccrs.GOOGLE_MERCATOR).opts(color='lightblue')
+        buildings_in = gv.Polygons(gdfs[0], crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
+        buildings_out = gv.Polygons(gdfs[1], crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='lightgrey')
+        rivers = gv.Polygons(gdfs[2], crs=ccrs.GOOGLE_MERCATOR).opts(color='lightblue')
 
         features = buildings_in * buildings_out * rivers * tiles
 
@@ -125,18 +127,18 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     
     elif basemap == False and viz_type == 'interactive/':
 
-        buildings_in = gv.Polygons(buildings_in, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
-        buildings_out = gv.Polygons(buildings_out, crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='lightgrey')
-        rivers = gv.Polygons(rivers, crs=ccrs.GOOGLE_MERCATOR).opts(color='lightblue')
+        buildings_in = gv.Polygons(gdfs[0], crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='red', xaxis=None, yaxis=None)
+        buildings_out = gv.Polygons(gdfs[1], crs=ccrs.GOOGLE_MERCATOR).opts(tools=['hover'], color_index=None, color='lightgrey')
+        rivers = gv.Polygons(gdfs[2], crs=ccrs.GOOGLE_MERCATOR).opts(color='lightblue')
         
         features = buildings_in * buildings_out * rivers
 
         # Similar to matplotlib legend artists have to be declared separately
         
         popts = dict(show_legend=True, apply_ranges=False)
-        bldg_in_leg = gv.Polygons(buildings_in, label="Buildings within 500m of rivers/stream").opts(color_index=None, color='red', **popts)
-        bldg_out_leg = gv.Polygons(buildings_out, label="Buildings outside 500m of rivers/stream").opts(color_index=None, color='lightgrey', **popts)
-        rivers_leg = gv.Polygons(rivers, label="Rivers/streams").opts(color_index=None, color='lightblue', **popts)
+        bldg_in_leg = gv.Polygons(gdfs[0], label="Buildings within 500m of rivers/stream").opts(color_index=None, color='red', **popts)
+        bldg_out_leg = gv.Polygons(gdfs[1], label="Buildings outside 500m of rivers/stream").opts(color_index=None, color='lightgrey', **popts)
+        rivers_leg = gv.Polygons(gdfs[2], label="Rivers/streams").opts(color_index=None, color='lightblue', **popts)
 
         legend = bldg_in_leg * bldg_out_leg * rivers_leg
 
@@ -148,7 +150,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
 
     elif basemap == False and viz_type == 'static/':           
     
-        layout = (gv.Polygons(buildings_in, group="buildings_in") * gv.Polygons(buildings_out, group="buildings_out") * gv.Polygons(rivers, group="rivers")).opts(projection=ccrs.Mercator())
+        layout = (gv.Polygons(gdfs[0], group="buildings_in") * gv.Polygons(gdfs[1], group="buildings_out") * gv.Polygons(gdfs[2], group="rivers")).opts(projection=ccrs.Mercator())
 
         layout.opts(
             opts.Polygons('buildings_in', cmap=['red'], edgecolor='black', linewidth=0.5, backend="matplotlib"),
@@ -162,7 +164,7 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
         
     elif basemap and viz_type == 'static/':
         
-        layout = tiles * gv.Polygons(buildings_in, group="buildings_in") * gv.Polygons(buildings_out, group="buildings_out") * gv.Polygons(rivers, group="rivers").opts(projection=ccrs.Mercator())
+        layout = tiles * gv.Polygons(gdfs[0], group="buildings_in") * gv.Polygons(gdfs[1], group="buildings_out") * gv.Polygons(gdfs[2], group="rivers").opts(projection=ccrs.Mercator())
 
         layout.opts(
             opts.Polygons('buildings_in', cmap=['red'], edgecolor='black', linewidth=0.5, backend="matplotlib"),

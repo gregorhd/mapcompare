@@ -8,6 +8,7 @@ This is to avoid tile loading or writing to disk affecting performance measureme
 """
 
 import os
+from geopandas import GeoDataFrame
 import hvplot.pandas
 from IPython.display import display
 from mapcompare.sql2gdf import sql2gdf
@@ -18,12 +19,12 @@ outputdir = "mapcompare/outputs/"
 viz_type = 'interactive/'
 
 # INPUTS
-db_name = 'dd'
-basemap = False
+db_name = 'dd_subset'
+basemap = True
 savefig = False
 
 
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: GeoDataFrame) -> GeoDataFrame:
     """Transforms gdfs to EPSG:4326 and renames the 'geom' column to 'geometry'. The latter is required pending a fix by GeoViews/HoloViews (see GeoViews issue #506).
 
     These steps are separated from actual rendering to not affect performance measurement.
@@ -43,7 +44,7 @@ def prepGDFs(*gdfs):
 
 
 @to_cProfile
-def renderFigure(merged, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(merged: GeoDataFrame, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters

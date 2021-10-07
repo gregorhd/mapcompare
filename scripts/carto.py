@@ -15,6 +15,7 @@ import contextily as ctx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from cartopy import crs as ccrs
+from geopandas import GeoDataFrame
 from mapcompare.sql2gdf import sql2gdf
 from mapcompare.misc.pw import password
 import requests
@@ -26,11 +27,11 @@ viz_type = 'static/' # type non-adjustable
 
 # INPUTS
 db_name = 'dd_subset' 
-basemap = False
-savefig = True
+basemap = True
+savefig = False
 
 
-def getExtent(*gdfs):
+def getExtent(*gdfs: GeoDataFrame) -> list:
     """Return combined bbox of all GDFs in cartopy set_extent format (x0, x1, y0, y1).
 
     This step is separated from actual rendering to not affect performance measurement.
@@ -49,7 +50,7 @@ def getExtent(*gdfs):
 
 
 @to_cProfile
-def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(*gdfs: GeoDataFrame, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters
@@ -79,9 +80,9 @@ def renderFigure(buildings_in, buildings_out, rivers, basemap=basemap, savefig=s
     
     # Add features to Axes with cartopy add_geometries()
     
-    ax.add_geometries(buildings_in.geometry, crs, facecolor='red')
-    ax.add_geometries(buildings_out.geometry, crs, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
-    ax.add_geometries(rivers.geometry, crs, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
+    ax.add_geometries(gdfs[0].geometry, crs, facecolor='red')
+    ax.add_geometries(gdfs[1].geometry, crs, facecolor='lightgrey', edgecolor='black', linewidth=0.1)
+    ax.add_geometries(gdfs[2].geometry, crs, facecolor='lightblue', edgecolor='blue', linewidth=0.25)
 
     if basemap:
         try:

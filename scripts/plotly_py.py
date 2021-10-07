@@ -9,6 +9,8 @@ This is to avoid tile loading or writing to disk affecting performance measureme
 
 import os
 import json
+from typing import Tuple
+from geopandas import GeoDataFrame
 import numpy as np
 import plotly.express as px
 from mapcompare.sql2gdf import sql2gdf
@@ -19,12 +21,12 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'interactive/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd'
-basemap = False
+db_name = 'dd_subset'
+basemap = True
 savefig = False
 
 
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: GeoDataFrame) -> Tuple[GeoDataFrame, int, np.float64, np.float64, str]:
     """Prepare GeoDataFrames for use by plotly.py's express.choropleth() or express.choropleth_mapbox() functions.
 
     This step is separated from actual rendering to not affect performance measurement. 
@@ -91,7 +93,7 @@ def prepGDFs(*gdfs):
 
 
 @to_cProfile
-def renderFigure(merged, zoom, centerx, centery, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(merged: GeoDataFrame, zoom: int, centerx: np.float64, centery: np.float64, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters

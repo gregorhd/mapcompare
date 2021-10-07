@@ -169,7 +169,7 @@ dependencies:
   - numpy=1.20.3=py38h09042cb_0
   - olefile=0.46=pyh9f0ad1d_1
   - openjpeg=2.4.0=hb211442_1
-  - openssl=1.1.1k=h8ffe710_0
+  - openssl=1.1.1l=h8ffe710_0
   - packaging=20.9=pyh44b312d_0
   - pandas=1.2.4=py38h60cbd38_0
   - pandoc=2.14.0.1=h8ffe710_0
@@ -216,6 +216,7 @@ dependencies:
   - python-chromedriver-binary=92.0.4515.43.0=py38haa244fe_0
   - python-dateutil=2.8.1=py_0
   - python-docx=0.8.11=pyhd8ed1ab_0
+  - python-dotenv=0.19.0=pyhd8ed1ab_0
   - python-snappy=0.6.0=py38h8566a25_0
   - python_abi=3.8=1_cp38
   - pytz=2021.1=pyhd8ed1ab_0

@@ -11,10 +11,12 @@ import sys
 import importlib
 import numpy as np
 from spatialpandas import GeoDataFrame
+import geopandas as gpd # for type hinting only
+from typing import Tuple, List
 import datashader as ds
 import datashader.transfer_functions as tf
 import datashader.utils as utils
-from mapcompare.sql2gdf import sql2gdf
+from mapcompare.sql2gdf import sql2gdf, timer
 from mapcompare.misc.pw import password
 importlib.reload(sys.modules['mapcompare.cProfile_viz']) # no kernel/IDE restart needed after editing cProfile_viz.py
 from mapcompare.cProfile_viz import to_cProfile
@@ -25,16 +27,16 @@ viz_type = 'static/' # not adjustable
 basemap = False # not adjustable
 
 # INPUTS
-db_name = 'dd'
-savefig = False
+db_name = 'dd_subset'
+savefig = True
 
-
-def prepGDFs(buildings_in, buildings_out, rivers):
+@timer
+def prepGDFs(*gdfs: gpd.GeoDataFrame) -> Tuple[GeoDataFrame, List[np.float64]]:
     """Prepare GeoDataFrames for use by datashader's transfer_functions.shade() method.
 
     This step is separated from actual rendering to not affect performance measurement. 
     """
-    def getBBox(*gdfs):
+    def getBBox(*gdfs: gpd.GeoDataFrame):
         """Return combined bbox of all GDFs in format (x0, x1, y0, y1).
         """
 
@@ -49,15 +51,15 @@ def prepGDFs(buildings_in, buildings_out, rivers):
         
         return extent
 
-    extent = getBBox(buildings_in, buildings_out, rivers)
+    extent = getBBox(*gdfs)
 
-    buildings_in['category'] = 'Within_500m'
-    buildings_out['category'] = 'Outside_500m'
-    rivers['category'] = 'River/stream'
+    gdfs[0]['category'] = 'Within_500m'
+    gdfs[1]['category'] = 'Outside_500m'
+    gdfs[2]['category'] = 'River/stream'
     
 
     # Merge GDFs and set category column 
-    merged = buildings_in.append(buildings_out).append(rivers)
+    merged = gdfs[0].append(gdfs[1]).append(gdfs[2])
     merged['category'] = merged['category'].astype('category')
     
     spatialpdGDF = GeoDataFrame(merged)
@@ -66,7 +68,7 @@ def prepGDFs(buildings_in, buildings_out, rivers):
 
 
 @to_cProfile
-def renderFigure(spatialpdGDF, extent, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(spatialpdGDF: GeoDataFrame, extent: List[np.float64], basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template minus the basemap and legend.
 
     Parameters

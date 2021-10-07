@@ -17,8 +17,12 @@ cd to apps/gv_ds/ via the command line and enter 'bokeh serve --show main.py'.
 """
 
 import os
+from typing import Tuple
 import geoviews as gv
+from numpy import float64
 from spatialpandas import GeoDataFrame
+import geopandas as gpd # for type hinting only
+import numpy as np # for type hinting only
 import datashader as ds
 from bokeh.plotting import show
 from mapcompare.cProfile_viz import to_cProfile
@@ -41,7 +45,7 @@ basemap = True
 savefig = False
 
 
-def prepGDFs(*gdfs):
+def prepGDFs(*gdfs: gpd.GeoDataFrame) -> Tuple[GeoDataFrame, np.float64]:
     """Prepare GeoDataFrames for use by HoloViews' Polygons class.
 
     This step is separated from actual rendering to not affect performance measurement. 
@@ -70,7 +74,7 @@ def prepGDFs(*gdfs):
 
 
 @to_cProfile
-def renderFigure(spatialpdGDF, basemap=basemap, savefig=savefig, db_name=db_name, viz_type=viz_type):
+def renderFigure(spatialpdGDF: GeoDataFrame, basemap: bool=basemap, savefig: bool=savefig, db_name: str=db_name, viz_type: str=viz_type) -> None:
     """Renders the figure reproducing the map template.
 
     Parameters
