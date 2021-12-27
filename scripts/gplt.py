@@ -3,9 +3,9 @@
 """Plot figure using geoplot's polyplot() interface to matplotlib.
 
 Create cProfile of the plotting task only if no basemap is added.
-    
+
 Create a cProfile of the renderFigure() function encompassing the core plotting task.
-The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False. 
+The cProfile is dumped as a .prof in mapcompare/profiles/[viz_type]/[db_name]/) only if basemap=False and savefig=False.
 This is to avoid tile loading or writing to disk affecting performance measurement of the core plotting task.
 """
 
@@ -28,7 +28,7 @@ outputdir = 'mapcompare/outputs/'
 viz_type = 'static/' # type non-adjustable
 
 # INPUTS
-db_name = 'dd_subset' 
+db_name = 'dd_subset'
 basemap = True
 savefig = False
 
@@ -41,12 +41,12 @@ def prepGDFs(*gdfs: GeoDataFrame) -> Tuple[Tuple[GeoDataFrame], List[np.float64]
     gdfs = [gdf.to_crs(epsg=4326) for gdf in gdfs]
 
     list_of_bounds = [gdf.total_bounds for gdf in gdfs]
-                
+
     xmin = np.min([item[0] for item in list_of_bounds])
     xmax = np.max([item[2] for item in list_of_bounds])
     ymin = np.min([item[1] for item in list_of_bounds])
     ymax = np.max([item[3] for item in list_of_bounds])
-        
+
     # geoplot order different from cartopy order
     extent = [xmin, ymin, xmax, ymax]
 
@@ -69,12 +69,12 @@ def renderFigure(*gdfs, basemap: bool=basemap, savefig: bool=savefig, db_name: s
         Global scope variable indicating the source PostGIS database to be used, 'dd' being the complete dataset and 'dd_subset' the subset.
     viz_type : {'static/', 'interactive/'}
         Global scope variable indicating the visualisation type.
-    
+
     Returns
     ----------
         A figure reproducing the map template.
     """
-    
+
      # Get number of features per GDF, to display in legend
     buildings_in_no = str(len(gdfs[0].index))
     buildings_out_no = str(len(gdfs[1].index))
@@ -96,7 +96,7 @@ def renderFigure(*gdfs, basemap: bool=basemap, savefig: bool=savefig, db_name: s
     buildings_out_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='lightgrey', edgecolor='black', linewidth=0.5)]
     rivers_handle = [mpatches.Rectangle((0, 0), 1, 1, facecolor='lightblue',edgecolor='blue', linewidth=0.25)]
 
-    handles = buildings_in_handle + buildings_out_handle + rivers_handle 
+    handles = buildings_in_handle + buildings_out_handle + rivers_handle
     labels = ['Buildings within 500m (n=' + buildings_in_no + ')', 'Buildings outside 500m (n=' + buildings_out_no + ')', 'Rivers or streams (n=' + rivers_no + ')']
 
     ax.legend(handles, labels, title=None, title_fontsize=14, fontsize=18, loc='best', frameon=True, framealpha=1)
@@ -114,12 +114,12 @@ def renderFigure(*gdfs, basemap: bool=basemap, savefig: bool=savefig, db_name: s
         plt.savefig(outputdir + viz_type + "geoplot (" + db_name + ").svg", format="svg", orientation="landscape")
     else:
         pass
-    
+
 
 if __name__ == "__main__":
 
-    buildings_in, buildings_out, rivers = sql2gdf(db_name, password) 
+    buildings_in, buildings_out, rivers = sql2gdf(db_name, password)
 
     ((buildings_in, buildings_out, rivers), extent) = prepGDFs(buildings_in, buildings_out, rivers)
-    
+
     renderFigure(buildings_in, buildings_out, rivers)

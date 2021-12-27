@@ -27,7 +27,7 @@ gv.extension('bokeh')
 
 
 # INPUTS
-db_name = 'dd'
+db_name = 'dd_subset'
 
 def prepGDFs(*gdfs):
     """Prepare GeoDataFrames for use by Holoviews' Polygons class.
