@@ -117,7 +117,8 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 (A) *GeoPandas*’ `GeoDataFrame.plot()` method, (B) *Cartopy*'s `add_geometries()` function, (C) *Geoplot*'s `polyplot()` function, (D) *Altair*’s `Chart` class, (E) *Datashader*'s `transfer_functions.shade()` function
 
-![Overview of outputs - static](sample_outputs_static.svg)
+![Overview of outputs - static](./sample_outputs_static.svg)
+<img src="./sample_outputs_static.svg">
 
 ![Comparison of outputs - static](meta_outputs_static.png)
 
@@ -125,7 +126,8 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 (A) *Bokeh*'s `figure.patches()` function, (B) *GeoViews*' `Polygons` class + *Bokeh* backend, (C) *GeoViews’* `Polygons` class + *datashader*’s `datashade` function + *Bokeh Server*, (D) *hvPlot*'s `hvplot()` method, (E) *Plotly.py*'s `express.choropleth_mapbox()` function
 
-![Overview of outputs - interactive](sample_outputs_interactive.svg)
+![Overview of outputs - interactive](./sample_outputs_interactive.svg)
+<img src="./sample_outputs_interactive.svg">
 
 ![Comparison of outputs - interactive](meta_outputs_interactive.png)
 
