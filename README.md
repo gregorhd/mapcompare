@@ -53,7 +53,7 @@ Long-listed libraries were first compared by compiling a range of metadata:
 5.	Proxies suggesting the vibrancy of the developer and user community.
 
 
-The short list tried to include both large-community projects (e.g., *Bokeh* and *Plotly*) as well as libraries relying on a more limited number of contributors (e.g., *geoplot*). All short-listed libraries needed to show on-going development in the last year (hence the exclusion of *mplleaflet* and *geoplotlib*) and needed to be able to plot geometries without employing a Web Tile Service (hence the exclusion of *folium*). A variety of backends and both imperative and declarative approaches are included. Finally,* datashader* was included in the static track ‘out of competition’, to first demonstrate its ‘as-is’ functionality before employing it in the interactive track in conjunction with a core plotting library.
+The short list tried to include both large-community projects (e.g., *Bokeh* and *Plotly*) as well as libraries relying on a more limited number of contributors (e.g., *geoplot*). All short-listed libraries needed to show on-going development in the last year (hence the exclusion of *mplleaflet* and *geoplotlib*) and needed to be able to plot geometries without employing a Web Tile Service (hence the exclusion of *folium*). A variety of backends and both imperative and declarative approaches are included. Finally, *datashader* was included in the static track ‘out of competition’, to first demonstrate its ‘as-is’ functionality before employing it in the interactive track in conjunction with a core plotting library.
 
 The short-listed libraries were then compared along these indicators:
 
