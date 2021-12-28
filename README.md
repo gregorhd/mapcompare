@@ -23,7 +23,7 @@ The figure below expands on [VanderPlas (2017)]( https://www.youtube.com/watch?v
 
 
 
-![The Python visualisation landscape](python_viz_landscape.png)
+![The Python visualisation landscape](data/python_viz_landscape.png)
 
 
 
@@ -90,7 +90,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 |  **Static**  | **Interactive**  |
 |--|--|
-| ![code comparison - static](comp_code_static.png) |  ![code comparison - interactive](comp_code_interactive.png)  |
+| ![code comparison - static](data/comp_code_static.png) |  ![code comparison - interactive](data/comp_code_interactive.png)  |
 
 ### CPU runtime
 
@@ -98,7 +98,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 |  **Static**  | **Interactive**  |
 |--|--|
-| ![cProfile comparison - static](comp_profile_static_dd_subset.png) |  ![cProfile comparison - interactive](comp_profile_interactive_dd_subset.png)  |
+| ![cProfile comparison - static](data/comp_profile_static_dd_subset.png) |  ![cProfile comparison - interactive](data/comp_profile_interactive_dd_subset.png)  |
 
 
 ####  Complete dataset (feature count: 144,727)
@@ -106,7 +106,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 | **Static** | **Interactive** |
 |--|--|
-| ![cProfile comparison - static](comp_profile_static_dd.png)  |  ![cProfile comparison - interactive](comp_profile_interactive_dd.png) |
+| ![cProfile comparison - static](data/comp_profile_static_dd.png)  |  ![cProfile comparison - interactive](data/comp_profile_interactive_dd.png) |
 
 
 ## Output samples
@@ -117,19 +117,17 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 (A) *GeoPandas*’ `GeoDataFrame.plot()` method, (B) *Cartopy*'s `add_geometries()` function, (C) *Geoplot*'s `polyplot()` function, (D) *Altair*’s `Chart` class, (E) *Datashader*'s `transfer_functions.shade()` function
 
-![Overview of outputs - static](./sample_outputs_static.svg)
-<img src="./sample_outputs_static.svg">
+![Overview of outputs - static](data/sample_outputs_static.png)
 
-![Comparison of outputs - static](meta_outputs_static.png)
+![Comparison of outputs - static](data/meta_outputs_static.png)
 
 ### Interactive visualisations
 
 (A) *Bokeh*'s `figure.patches()` function, (B) *GeoViews*' `Polygons` class + *Bokeh* backend, (C) *GeoViews’* `Polygons` class + *datashader*’s `datashade` function + *Bokeh Server*, (D) *hvPlot*'s `hvplot()` method, (E) *Plotly.py*'s `express.choropleth_mapbox()` function
 
-![Overview of outputs - interactive](./sample_outputs_interactive.svg)
-<img src="./sample_outputs_interactive.svg">
+![Overview of outputs - interactive](data/sample_outputs_interactive.png)
 
-![Comparison of outputs - interactive](meta_outputs_interactive.png)
+![Comparison of outputs - interactive](data/meta_outputs_interactive.png)
 
 ## Study limitations
 
