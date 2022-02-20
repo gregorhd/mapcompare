@@ -90,7 +90,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 |  **Static**  | **Interactive**  |
 |--|--|
-| ![code comparison - static](data/comp_code_static.png) |  ![code comparison - interactive](data/comp_code_interactive.png)  |
+| ![code comparison - static](data/comp_code_static.jpg) |  ![code comparison - interactive](data/comp_code_interactive.jpg)  |
 
 ### CPU runtime
 
@@ -98,7 +98,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 |  **Static**  | **Interactive**  |
 |--|--|
-| ![cProfile comparison - static](data/comp_profile_static_dd_subset.png) |  ![cProfile comparison - interactive](data/comp_profile_interactive_dd_subset.png)  |
+| ![cProfile comparison - static](data/comp_profile_static_dd_subset.jpg) |  ![cProfile comparison - interactive](data/comp_profile_interactive_dd_subset.jpg)  |
 
 
 ####  Complete dataset (feature count: 144,727)
@@ -106,7 +106,7 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 | **Static** | **Interactive** |
 |--|--|
-| ![cProfile comparison - static](data/comp_profile_static_dd.png)  |  ![cProfile comparison - interactive](data/comp_profile_interactive_dd.png) |
+| ![cProfile comparison - static](data/comp_profile_static_dd.jpg)  |  ![cProfile comparison - interactive](data/comp_profile_interactive_dd.jpg) |
 
 
 ## Output samples

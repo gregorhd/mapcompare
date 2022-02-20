@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Create bar chart of total cProfile run time of renderFigure across all tested libraries for either the interactive or static track and either the full ('dd') or subset ('dd_subset') database.
+"""Create dark themed bar chart of total cProfile run time of renderFigure across all tested libraries for either the interactive or static track and either the full ('dd') or subset ('dd_subset') database.
 
 Commented out: (a) display snakeviz icicle graph in browser for a single cProfile, (b) save final dataframe to docx table.
 """
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     df1['std'] = df.groupby('library', as_index=False)['cumtime'].std()['cumtime'].round(decimals=3)
 
     if viz_type == 'interactive/':
-        rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nGeoViews+\nBokeh'}
+        rename_dict = {'bkh': 'Bokeh', 'plotly_py': 'Plotly.py', 'gv': 'GeoViews+\nBokeh', 'gv_ds': 'GeoViews+\ndatashader+\nBokeh Server', 'hv_plot': 'hvPlot+\nGeoViews+\nBokeh*'}
 
     else:
         rename_dict = {'alt': 'Altair+\nVega-Lite', 'carto': 'Cartopy+\nMatplotlib', 'ds': 'Data-\nshader*', 'gpd': 'GeoPandas+\nMatplotlib', 'gplt': 'geoplot+\nMatplotlib', 'gv': 'GeoViews+\nMatplotlib'}
@@ -97,21 +97,35 @@ if __name__ == "__main__":
 
     # Plot cumtimes to bar chart
 
-    ax = df1.plot.bar(x=x_label, y="mean", yerr=list(df1['std']), ecolor='grey', capsize=5, alpha=0.5, ylabel="seconds", rot='horizontal', title="cProfile: mean cumulative CPU runtime ("+ str(num_times) + ' runs)', legend=False)
+    FOREGROUND = '#BFBFBF'
+    BACKGROUND = '#201D13'
+
+    ax = df1.plot.bar(x=x_label, y="mean", yerr=list(df1['std']), ecolor='grey', capsize=5, alpha=0.5, ylabel="seconds", rot='horizontal', facecolor='#868450', legend=False)
 
     for i in range(len(df1['mean'])):
-        plt.annotate("{:.2f}".format(df1['mean'][i]) + 's', xy=(df.index[i], df1['mean'][i]), ha='center', va='bottom')
+        plt.annotate("{:.2f}".format(df1['mean'][i]) + 's', xy=(df.index[i], df1['mean'][i]), ha='center', va='bottom', color='white')
 
     plt.subplots_adjust(bottom=0.25)
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-    ax.set_title("cProfile: mean cumulative CPU runtime ("+ str(num_times) + ' runs)', pad=0)
+    ax.spines["left"].set_color(FOREGROUND)
+    ax.spines["bottom"].set_color(FOREGROUND)
+    ax.set_xlabel(x_label, color=FOREGROUND)
+    ax.set_ylabel("# of lines of code", color=FOREGROUND)
+    ax.tick_params(axis='x', colors=FOREGROUND)
+    ax.tick_params(axis='y', colors=FOREGROUND)
+
+    ax.set_facecolor(BACKGROUND)
+    ax.set_title("cProfile: mean cumulative CPU runtime ("+ str(num_times) + ' runs)', pad=20, color='white')
+
+    plt.rcParams.update({'figure.facecolor': BACKGROUND})
+
     plt.tight_layout()
 
-    plt.savefig(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' comparison.jpg', dpi=300, facecolor='white')
+    plt.savefig(profiledir + datetime.today().strftime('%Y-%m-%d') + ' ' + db_name + ' comparison_dark.jpg', dpi=300)
 
-    plt.savefig('data/comp_profile_' + viz_type[:-1] + '_' + db_name + '.jpg', dpi=300, facecolor='white')
+    # plt.savefig('comp_profile_' + viz_type[:-1] + '_' + db_name, facecolor='white')
 
     # # Create a docx containing the final dataframe
 
