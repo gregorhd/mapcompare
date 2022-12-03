@@ -1,7 +1,7 @@
 
 > A comparison of Python libraries for static and interactive visualisations of large vector data.
-> Take me to [the blog post](https://gregorhd.github.io/geospatial-visualisation-in-python/)
-> Take me to [the preprint](https://arxiv.org/abs/2202.13105)
+
+> Take me to [the blog post](https://gregorhd.github.io/geospatial-visualisation-in-python/) or [the preprint](https://arxiv.org/abs/2202.13105)
 
 - [Which libraries are being compared?](#which-libraries-are-being-compared)
 - [How are libraries being compared?](#how-are-libraries-being-compared)
