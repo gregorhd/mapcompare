@@ -1,5 +1,7 @@
 
 > A comparison of Python libraries for static and interactive visualisations of large vector data.
+> Take me to [the blog post](https://gregorhd.github.io/geospatial-visualisation-in-python/)
+> Take me to [the preprint](https://arxiv.org/abs/2202.13105)
 
 - [Which libraries are being compared?](#which-libraries-are-being-compared)
 - [How are libraries being compared?](#how-are-libraries-being-compared)
@@ -131,12 +133,9 @@ Excluding blank lines and comments, and assessing the 'reduced code' versions in
 
 ## Study limitations
 
-Limitations for two of the chosen indicators should be highlighted here. Employing any of the short-listed libraries involves multiple complex technologies, some of which exist outside the Python ecosystem (e.g., Jupyter Notebook or the JavaScript libraries underlying both *Bokeh* and *Plotly.py*). Due to these confounding variables, the various adjustments outlined above are unlikely to have established a truly level playing field with regard to comparing CPU runtimes. What the *cProfile* results seek to demonstrate is a relative comparison of the user experience and the approximate time required to generate a map product on screen.
-
-Due to the subjectivity of lines of code as a measure for code complexity, an alternative methodology could see groups of experts for each implementation develop a ‘best practice’ code sample, though this may further reduce comparability.
-
-It must also be acknowledged that the static map products would not be considered useful outputs in most real-world scenarios: due to significant overplotting, a building-level analysis would rarely be presented at such a small representative fraction. Additionally, when converting figures to SVG on the static track, the large file sizes using the complete dataset would cause most viewing applications to become unresponsive. The same is true for saving to HTML on the interactive track. Except for live server-side aggregation and rasterisation as demonstrated by the *GeoViews* + *datashader* + *Bokeh Server* implementation, most workflows targeting web-based distribution would involve prior conversion to a series of map tiles to then be served by client-side Web Tile Services.
-
-Similarly, the simplicity of the chosen visualisation task also meant that more advanced, and for local authorities potentially more interesting, use cases such as dashboarding were not demonstrated. Both *Bokeh*’s and *Plotly*’s native dashboarding capabilities as well as HoloViz’s *Panel* library are therefore mentioned here.
-
-Finally, due to the interconnectedness of the Python ecosystem, a library’s functionalities and performance cannot be solely attributed to its own codebase. All libraries as well as their dependencies are under constant development. As such, the state of play outlined here represents merely a snapshot.
+1. All of the short-listed libraries employ multiple complex technologies, some of which outside the Python ecosystem (e.g., the JavaScript libraries underlying both _Bokeh_ and _Plotly.py_). Due to these confounding variables, and even with the various code adjustments mentioned above, I most certainly failed to establish a truly level playing field with regard to comparing CPU runtimes. What the _cProfile_ results show is simply indicative of the user experience and the approximate time required to generate a map product on screen.
+2. Lines of code is a poor measure for code complexity. Alternatively, one could see groups of experts for each implementation develop a 'best practice' code sample, though I'm sceptical this would increase comparability (or would be feasible in practice).
+3. The static map products would not be considered useful outputs in most real-world scenarios: due to significant overplotting, a building-level analysis would rarely be presented at such a small representative fraction. And as for the interactive products, except for live server-side aggregation and rasterisation as demonstrated by the _GeoViews_ + _datashader_ + _Bokeh Server_ implementation, serving large quantities of geospatial data over the web would nowadays probably involve prior conversion to raster or vector tiles.
+4. The simplicity of the visualisation task meant that more advanced, and for users such as local authorities potentially more interesting, use cases such as dashboarding were not demonstrated. If this is something you'd like to explore, do check out _Bokeh_'s and _Plotly_'s native dashboarding capabilities ([Dash](https://dash.plotly.com/)) as well as HoloViz's [Panel](https://panel.holoviz.org/) library including its app gallery on [awesome-panel.org](https://awesome-panel.org/gallery) for inspiration.
+5. Due to the interconnectedness of the Python ecosystem, a library's functionalities and performance can never be solely attributed to its own codebase.
+6. Finally, all libraries as well as their dependencies are under constant development. As such, the state of play outlined here represents merely a snapshot as of mid-2021.
